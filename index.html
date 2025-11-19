@@ -1,1 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Global Forex Treasury</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="copyright" content="Copyright 2025 © Global Forex Treasury"> 
+<script src="https://unpkg.com/xrpl@2.13.0/dist/xrpl.min.js"></script>
+
+<style>
+  /* ---- BASIC RESET ---- */
+  *{margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  }
+  body{
+    font-family:Arial,Helvetica,sans-serif;
+    max-width: 1200px;
+    margin: 10px auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.5;
+  }
+  a{
+  text-decoration:none;
+  color:inherit;
+  }
+.section {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    border: 1px solid #0066cc;
+    padding: 20px 20px;
+    margin-bottom: 6px 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+  /* ---- HEADER ---- */
+ header {
+    display: flex;
+    align-items: center;        /* Vertically center logo and title */
+    justify-content: center;    /* This will center the h1 in the available space */
+  	margin:4px 4px;
+  	padding: 20px 2px;
+  	border: 1px solid #0066cc;
+  	border-radius: 5px; 
+    position: relative;
+    gap: 20px;                  /* Space between logo and title */
+}
+h1 {
+    font-size: 2.2rem;
+    margin: 0;
+    color: #1a1a1a;
+    flex: 1;                    /* Take up remaining space */
+    text-align: center;
+}
+.logo {
+    max-width: 120px;
+    height: auto;
+    position: absolute;         /* Pull logo to the left edge */
+    left: 15px;                 /* Match header padding */
+    top: 50%;
+    transform: translateY(-50%); /* Perfect vertical centering */
+}
+footer{
+   text-align: left;
+   padding: 2px 2px;
+  	border: 1px solid #0066cc;
+  	border-radius: 5px;    
+   position: relative;
+   font-size:0.85rem;
+   margin: 4px 4px;
+       
+}
+@media (max-width: 480px) {
+  .logo { max-width: 120px; }
+  h1 { font-size: 1.8rem; }
+}
+  </style>
+  
+<style>
+  /* ---- WALLET (top-right) ---- */
+  .wallet{
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    text-align: right;
+    font-size: 0.9rem;
+  }
+  #walletBtn{
+    background: #0066cc;
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  #walletBtn: hover{background:#004999;
+  }
+  
+  #walletStatus{
+    margin-top: 10px;
+    color: #555;
+    font-family: monospace;
+  }
+</style>
+  
+<style>
+  /* ---- TABLE ---- */
+  .container{
+  max-width:100%;
+  margin:4px 4px;
+  padding: 0px 0px;
+  border: 1px solid #0066cc;
+  border-radius: 5px; 
+  }
+  
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:#fff;
+    box-shadow:0 1px 4px rgba(0,0,0,0.1);
+  	border: none;
+  }
+
+  th{
+    background:#f0f0f0;
+    padding:10px 8px;
+    text-align:center;
+    font-weight:bold;
+    font-size:0.95rem;
+    border-bottom:1px solid #ddd;
+  }
+  td{
+    padding:10px 6px;
+    text-align:center;
+    border-bottom:1px solid #eee;
+  }
+  tr:hover{background:#f9f9f9;}
+</style>
+  
+<style>
+  /* ---- BUTTONS ---- */
+  .btn{
+    background:#0066cc;
+    color:#fff;
+    border:2px solid #004999;
+    padding:6px 10px;
+    border-radius:4px;
+    cursor:pointer;
+    font-size:0.85rem;
+    font-weight:bold;
+    min-width:78px;
+  }
+  .btn:hover{background:#004999;}
+  .btn-info{background:#17a2b8;border-color:#117a8b;}
+  .btn-info:hover{background:#117a8b;
+  }
+</style>
+  
+<style>
+  /* ---- ARROW + % ---- */
+.change {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+
+.change .arrow {
+  font-size: 1.1em;
+}
+
+.change.up   { color: #0abb0a; }
+.change.down { color: #e63946; }
+  
+</style>
+  
+<style>
+  /* ---- MODAL ---- */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8);
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow: auto;
+}
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+  color: #000;
+}
+.close {
+  position: absolute;
+  top: 10px; right: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #aaa;
+}
+.close:hover { 
+	color: #000; 
+}
+.flag-img { 
+	width: 80px; 
+	height: auto; 
+	margin: 10px; 
+	border: 1px 
+	solid #ddd; 
+	}
+.map-img  { 
+	width: 200px; 
+	height: auto; 
+	margin: 10px; 
+	border: 1px 
+	solid #ddd; 
+	}
+.read-more { 
+	color: #0066cc; 
+	cursor: pointer; 
+	text-decoration:
+	underline; 
+	}
+.details { 
+	margin-top: 8px; 
+	font-size: 0.9em; 
+	color: #555; 
+	display: none; 
+}
+</style>
+
+<style>
+/* ==== DOCUMENT MODALS (White Paper & Warning) ==== */
+.doc-modal {
+  display: none;
+  position: fixed;
+  z-index: 1100;               /* higher than your info modal */
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.75);
+  overflow: auto;
+}
+.doc-modal-content {
+  background: #fff;
+  margin: 20px auto;
+  padding: 22px;
+  width: 90%;
+  max-width: 720px;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  position: relative;
+  max-height: 86vh;
+  overflow-y: auto;
+}
+
+.doc-close {
+  position: absolute;
+  top: 8px; right: 14px;
+  font-size: 30px;
+  font-weight: bold;
+  color: #999;
+  cursor: pointer;
+}
+.doc-close:hover {
+	color: #000;
+}
+.doc-modal h2 { 
+	margin-top:0; 
+	color:#0066cc; 
+	border-bottom:2px solid #0066cc; 
+	padding-bottom:6px; 
+}
+#docPdfViewer {
+	width:100%; 
+	height:70vh; 
+	border:none; 
+	border-radius:8px; 
+}
+/* Footer buttons (same look as before) */
+.doc-footer-btn {
+  background:#0066cc; color:#fff; border:none;
+  padding:9px 15px; margin:0 6px;
+  border-radius:6px; cursor:pointer;
+  font-size:0.9rem; transition:0.2s;
+}
+.doc-footer-btn:hover { 
+	background:#004a99; 
+}
+/* ==== T&C WARNING MODAL – FIX BULLETS & FONT SIZE ==== */
+#docWarningModal .doc-modal-content {
+  padding-left: 28px;     /* gives breathing room for bullets */
+  padding-right: 28px;
+  font-size: 0.90rem;     /* one size smaller (from ~16px &#8594; ~15px) */
+  line-height: 1.5;
+}
+
+#docWarningModal ul {
+  margin-left: 18px;      /* indents bullet lists */
+  padding-left: 0;
+}
+
+#docWarningModal li {
+  margin-bottom: 6px;
+  line-height: 1.2;  
+}
+</style>
+  
+<style>
+  /* ---- RESPONSIVE ---- */
+  @media (max-width:768px){
+    th,td{display:block;width:100%;text-align:right;padding-left:50%;}
+    th{display:none;}
+    td::before{
+      content:attr(data-label);
+      position:absolute;
+      left:12px;
+      font-weight:bold;
+      color:#0066cc;
+    }
+    td{border:none;padding:8px 12px;}
+    tr{margin-bottom:12px;border:1px solid #ddd;border-radius:6px;}
+  }
+  
+.slogan {
+  font-style: italic;
+  font-size:1.0rem;
+  color: #003366;
+  background: #f0f7ff;
+  padding: 10px;
+  border-radius: 5px;
+  margin-left: 10px;
+  margin-right: 10px;
+  max-width: 100%;
+  border: 1px solid #0066cc;
+}
+.price-cell {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  color: #00aa00;
+  text-align: center;
+  font-size: 0.9rem;
+}
+.price-cell::before { 
+  content: '&#8776; '; 
+  opacity: 0.7; 
+}
+
+.price-cell {
+  position: relative;
+}
+.price-cell::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%; left: 50%;
+  transform: translateX(-50%);
+  background: #333; color: #fff;
+  padding: 4px 8px; border-radius: 4px;
+  font-size: 0.7rem; white-space: nowrap;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+.price-cell:hover::after {
+  opacity: 1;
+}
+</style>
+
+<style>
+/* === TAB CONTAINER === */
+.tabs-container {
+  max-width:100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid #0066cc;
+  border-radius: 5px;  
+  margin:4px 4px;
+  padding: 2px 2px;
+}
+
+.tab-row {
+  display: flex;
+  gap: 6px;
+}
+
+/* === UNIFORM TAB BUTTONS === */
+.tab-btn {
+  flex: 1;                     /* Equal width */
+  min-width: 0;                /* Allow shrinking */
+  padding: 10px 4px;
+  font-size: 0.9rem;
+  text-align: center;
+  white-space: normal;         /* Allow word wrap */
+  word-wrap: break-word;       /* Break long words */
+  line-height: 1.3;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover {
+  background: #e0e0e0;
+}
+
+.tab-btn.active {
+  background: #007bff;
+  color: white;
+  border-color: #0056b3;
+}
+
+/* Optional: Responsive – stack on very small screens */
+@media (max-width: 600px) {
+  .tab-row { flex-direction: column; }
+  .tab-btn { width: 100%; }
+}
+</style>
+
+<style>
+/* Flag styling – modern & consistent */
+.flag-icon {
+  width: 32px;
+  height: 24px;
+  border-radius: 6px;
+  object-fit: cover;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  vertical-align: middle;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.flag-icon:hover {
+  transform: scale(1.15);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+}
+
+/* Optional: make the table look tighter on mobile */
+@media (max-width: 768px) {
+  #currencyTable th:nth-child(1), #currencyTable td:nth-child(1) { width: 8%; }   /* a bit wider on small screens */
+  #currencyTable th, #currencyTable td { font-size: 0.85rem; }
+}
+</style>
+
+<style>
+/* ---------- TABLE LAYOUT ---------- */
+#currencyTable {
+  width: 100%;
+  table-layout: fixed;          /*  forces column widths */
+  border-collapse: collapse;
+}
+
+/* Column widths – add up to 100% */
+#currencyTable th:nth-child(1), #currencyTable td:nth-child(1) { width:  6%; } /* Flag   */
+#currencyTable th:nth-child(2), #currencyTable td:nth-child(2) { width: 22%; } /* Name   */
+#currencyTable th:nth-child(3), #currencyTable td:nth-child(3) { width:  7%; } /* Code   */
+#currencyTable th:nth-child(4), #currencyTable td:nth-child(4) { width: 10%; } /* Pair   */
+#currencyTable th:nth-child(5), #currencyTable td:nth-child(5) { width: 12%; } /* Price  */
+#currencyTable th:nth-child(6), #currencyTable td:nth-child(6) { width: 12%; } /* Info   */
+#currencyTable th:nth-child(7), #currencyTable td:nth-child(7) { width: 10%; } /* Change */
+#currencyTable th:nth-child(8), #currencyTable td:nth-child(8) { width: 12%; } /* Trade  */
+
+/* Center the flag and give it a tiny padding so it doesn’t touch the cell edge */
+#currencyTable td:nth-child(1) {
+  text-align: center;
+  padding: 4px 0;               /* vertical breathing room only */
+}
+</style>
+
+<style>
+/* === CURRENCY SYMBOLS ROW === */
+.currency-symbols {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #0066cc;
+  border-radius: 5px;  
+  margin:4px 4px;
+  padding: 20px 20px;
+  flex-wrap: wrap;           /* Wrap on very small screens */
+  max-width: 100%;          /* Optional: limit width */
+}
+.currency-symbols img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.currency-symbols img:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+.currency-symbols img[alt="XRP"] {
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+.sym-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: 24px;  /* Adjust for visibility */
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  color: #007bff;
+  font-weight: regular;
+  transition: transform 0.2s;
+}
+.sym-icon[alt="XRP"] {
+  font-size: 18px;  /* Adjust for visibility */
+  animation: pulse 2s infinite;
+}
+.sym-icon:hover {
+  transform: scale(1.15);
+  background: #e9ecef;
+}
+</style>
+<script src="https://unpkg.com/xrpl@2.13.0/dist/xrpl.min.js"></script>
+</head>
+
+<body>
+<div class="section" id="tradingGroups">
+<div class="section">
+<header>
+  <img id="logo" src="earthlogo.jpeg" alt="Logo" class="logo" width="740" height="740">
+  <h1>Global Forex Treasury</h1>
+   <div class="wallet">
+    <button id="walletBtn">Connect Wallet</button>
+    <div id="walletStatus">Not connected</div>
+  </div>
+</header>
+
+
+  <!-- === CURRENCY SYMBOLS ROW (under title/logo) === -->
+<div class="sym-container">  
+	<div class="currency-symbols">
+	  <!--<img src=" " alt="XRP" title="XRP">
+	  <img src="https://via.placeholder.com/50?text=USD" alt="USD" title="USD">	  
+	  <img src="https://via.placeholder.com/50?text=EUR" alt="EUR" title="Euro">
+	  <img src="https://via.placeholder.com/50?text=JPY" alt="JPY" title="Japanese Yen">
+	  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/UAE_Dirham_Symbol.svg/40px-UAE_Dirham_Symbol.svg.png" alt="AED" title="UAE Dirham">
+	  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Pridnestrovie_ruble_sign.svg/40px-Pridnestrovie_ruble_sign.svg.png" alt="RUB" title="Russian Rubble">
+	  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Old_Sheqel_sign.svg/40px-Old_Sheqel_sign.svg.png" alt="ILS title="Israeli Shekel">
+	  <img src="https://via.placeholder.com/50?text=GOLD" alt="Gold" title="Gold Backed">-->
+	  	<span class="sym-icon" alt="USD_Dollar">&#36</span> <!-- USD -->
+  		<span class="sym-icon" alt="Euro">&#8364</span> <!-- EUR -->
+  		<span class="sym-icon" alt="British_Sterling">&#163</span> <!-- GBP -->
+  		<span class="sym-icon" alt="Japanese_Yen">&#165</span> <!-- JPY -->
+  		<span class="sym-icon" alt="Thai_Baht">&#3647</span> <!-- THB -->
+  		<span class="sym-icon" alt="Spanish_Passeta">&#8359</span> <!-- ESP -->
+  		<span class="sym-icon" alt="Russian_Rubble">&#8381</span> <!-- RUB -->
+  		<span class="sym-icon" alt="Greek_Drachma">&#8367</span> <!-- GRD -->
+  		<span class="sym-icon" alt="French_Franc">&#8355</span> <!-- FRF -->
+	  	<span class="sym-icon" alt="XRP">XRP</span> <!-- XRP -->	  		
+  		<span class="sym-icon" alt="Brazilian_Cruzero">&#8354</span> <!-- CRZ -->  		  		
+  		<span class="sym-icon" alt="Korean_Won">&#8361</span> <!-- WON -->
+  		<span class="sym-icon" alt="Italian_Lira">&#8356</span> <!-- ITL -->
+  		<span class="sym-icon" alt="Nigerian_Niara">&#8358</span> <!-- NGN -->
+  		<span class="sym-icon" alt="Mexican_Peso">&#8369</span> <!-- MXN -->
+  		<span class="sym-icon" alt="Vietnam_Dong">&#8363</span> <!-- VND -->
+  		<span class="sym-icon" alt="Indian_Rupee">&#8377</span> <!-- INR -->
+  		<span class="sym-icon" alt="Israeli_Shekle">&#8362</span> <!-- ILS -->  
+  		<span class="sym-icon" alt="Deutsch_Mark">&#8499</span> <!-- DEM -->    		  		  		  		  		  		 		
+	</div>
+</div>	
+	
+
+  
+
+
+<!-- TABS -->
+<div class="tabs-container">
+<!--Row 1-->
+<div class="tab-row">
+  <button class="tab-btn active" data-group="exotics-rumor">Currency<br>Future Revaluation</button>
+  <button class="tab-btn" data-group="accord">Southern Africa<br>Self Determination Accord</button>
+  <button class="tab-btn" data-group="old">Historic Currencies<br> of Value</button>
+  <button class="tab-btn" data-group="britania">Britannic<br>Four Crowns</button>    
+  <button class="tab-btn" data-group="pre-euro">Pre-Euro<br>Currency values</button>
+</div>
+<!-- ROW 2 -->
+<div class="tab-row">
+    <button class="tab-btn" data-group="america">Cascades<br>North America</button>
+    <button class="tab-btn" data-group="latam">Latin &<br>Central America</button>
+    <button class="tab-btn" data-group="caribbean">Caribbean<br>Basin</button>    
+	 <button class="tab-btn" data-group="sadac">Sub Sahara<br>Southern African</button>
+	 <button class="tab-btn" data-group="wcafrica">West, Central & East<br>Africa Belt</button>
+	 <button class="tab-btn" data-group="levant">North Africa &<br>Middle East</button>
+</div>
+<!-- ROW 3 -->
+<div class="tab-row">
+	<button class="tab-btn" data-group="atlantic- eu">Europe & Britain<br>Euro Atlantic Realm</button>	 	 	 	 
+	<button class="tab-btn" data-group="scandinavia">Scandinavia<br>Nordic & Baltic Realm</button>
+	<button class="tab-btn" data-group="steppe">Eur-Asian<br>Stepp Belt</button>
+	<button class="tab-btn" data-group="india">Indian<br>Subcontinent</button>
+	<button class="tab-btn" data-group="east- asia">Orient & Far East</button>  
+	<button class="tab-btn" data-group="australia">Austral<br>Pacific Sphere</button>    
+</div>
+<!-- ROW 4 -->
+<div class="tab-row">    
+	<button class="tab-btn" data-group="trade">Trade Agreements</button>
+   	<button class="tab-btn" data-group="commodities">Commodities</button>
+	<button class="tab-btn" data-group="sdr">SDR</button>
+	<!-- Add more buttons here -->
+</div>
+</div>
+
+
+
+<div class="slogan" id="tabSlogan" style="display: none; text-align: center; font-weight: bold; color: #0066cc; margin: 4px 4px; align: center;"></div>
+<div class="container">
+  <table id="currencyTable">
+	<thead>
+  <tr>
+    <th data-label="Flag">Flag</th>      <!-- NEW -->
+    <th data-label="Name">Name</th>
+    <th data-label="Code">Code</th>
+    <th data-label="Pair">Pair</th>
+    <th data-label="Price/XRP">Price/XRP</th>
+    <th data-label="Info">Info</th>
+    <th data-label="Change">24h &#916;</th>
+    <th data-label="Trade">Trade</th>
+  </tr>
+	</thead>
+   <tbody></tbody>
+  </table>
+</div>
+
+<!-- ==== INFO MODAL ==== -->
+<div id="infoModal" class="modal">
+  <div class="modal-content">
+  	<div style="display: flex; gap: 5px; text-align:center; margin: 5px 5px; flex-wrap: wrap;"> 
+    	<span class="close">X</span>
+    	<img id="modalFlag" class="flag-img" loading="lazy" src="" alt="Flag">
+    	<h2 id="modalTitle"></h2>
+    </div>
+    <div style="text-align:right;">
+      	<img id="modalMap"  class="map-img"  loading="lazy" src="" alt="Map">
+    </div>
+    	<p><strong>Country:</strong> <span id="modalCountry"></span></p>
+    	<p><strong>Currency:</strong> <span id="modalCurrency"></span></p>
+    	<p><strong>ISO Country:</strong> <span id="modalISO"></span></p>
+    	<p><strong>ISO Currency:</strong> <span id="modalISO4217"></span></p>
+    	<p><strong>In Use:</strong> <span id="modalDates"></span></p>
+    	<p><strong>Last Day USD:</strong> <span id="modalLastUSD"></span></p>
+    	<p><strong>Backing:</strong> <span id="modalBacking"></span></p>
+    	<p><strong>History:</strong>
+    	<span id="modalHistory"></span></p>
+    	<div class="lost-potential" id="lostPotential" style="display:none;">
+            <p><strong>Lost Potential (If Prospered):</strong><br>
+      		<span id="modalHypothetical"></span><br>
+      		<span class="read-more" onclick="toggleDetails(this)">Read More (Math)</span>
+      		<div class="details" id="details">
+        		<span id="modalDetails"></span>
+      		</div>
+    	</div>
+  </div>
+</div>  
+    	
+
+<!-- ==== WHITE PAPER PDF MODAL ==== -->
+<div id="docWhitepaperModal" class="doc-modal">
+  <div class="doc-modal-content">
+    <span class="doc-close" onclick="closeDocModal('docWhitepaperModal')">&times;</span>
+    <h2>Global Forex Treasury – White Paper</h2>
+    <p><strong>Version 1.0&#8195;|&#8195;1 January  2025</strong></p>
+    <embed id="docPdfViewer" src="whitepaper.pdf" type="application/pdf" width="128" height="128">
+    <p style="text-align:center;margin-top:10px;color:#666;">
+      <em>Download: <a href="whitepaper.pdf" download>Save PDF</a></em>
+    </p>
+  </div>
+</div>
+
+<!-- ==== T&C + CAVEAT EMPTOR WARNING MODAL ==== -->
+<div id="docWarningModal" class="doc-modal">
+  <div class="doc-modal-content">
+    <span class="doc-close" onclick="closeDocModal('docWarningModal')">&times;</span>
+    <h2><b>Terms, Conditions & Risk Disclosure</b></h2>
+    <p><strong>Last Updated: 01 January 2025</strong></p>
+
+    <h3><b>Caveat Emptor - Buyer Beware</b></h3>
+    <p><strong>TRADING DIGITAL ASSETS AND CURRENCIES IS EXTREMELY RISKY.</strong></p>
+    <p>All information on <strong>Global Forex Treasury</strong> is for <strong>educational and informational purposes only</strong>.<br>
+    This is <strong>not financial advice</strong>.</p>
+
+    <h3>Key Warnings</h3>
+      <p>1. You <strong>must conduct your own research (DYOR)</strong> before any trade.<br>
+      2. Prices on the XRP Ledger are <strong>volatile, illiquid, and speculative</strong>.<br>
+      3. Many listed currencies are <strong>not officially issued</strong> on XRPL - values are community-driven.<br>
+      4. <strong>No guarantees</strong> of profit, revaluation, or liquidity.<br>
+      5. You are <strong>solely responsible</strong> for your wallet, keys, and trades.</p>
+   
+    <h3>No Liability</h3>
+    <p><strong>Global Forex Treasury</strong>does <strong>not</strong>:</p>
+      <p>1. Execute trades !<br>
+      2. Hold funds or keys !<br>
+      3. Collect personal data 1<br>
+      4. Operate under any financial license !</p>
+
+    <p>Trading Occurs on XRP Ledger. All "Trade" buttons link directly to <strong>decentralized XRPL interfaces.</strong></p><br>
+    <p> You interact <strong>at your own risk</strong> using your own wallet.</p>
+    <p>No individual or entity <!--claims ownership or-->takes liability for this platform.<!--It is<strong>open source</strong>(MIT license).--></p>
+    <hr>
+    <p style="text-align:center;font-style:italic;">
+      <strong>By using this site, you accept full responsibility for your own actions.</strong>
+    </p>
+  </div>
+</div>
+
+
+<!-- Email popup -->
+<div id="emailPopup" role="dialog" aria-modal="true" style="display: none; position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: white; padding: 20px; border: 2px solid navy; z-index: 200; width: 90%; max-width: 500px; border-radius: 12px;">
+    <h2 style="font-family: Tahoma; font-size: 24px; margin: 10px 0;">Send Us a Message</h2>
+    <form id="emailForm" onsubmit="sendEmail(event)">
+    <div style="margin-bottom: 10px;">
+        <label for="emailSubject" style="font-family: Tahoma; font-size: 16px;">Subject:</label>
+        <select id="emailSubject" name="subject" style="font-family: Tahoma; font-size: 16px; padding: 5px; width: 100%;">
+            <option value="Token Inquiry">Coin Inquiry</option>
+            <option value="Info Required">Info required</option>
+            <option value="My country is not listed">My Country is not Listed</option>
+            <option value="Ripple Ledger">Ripple Ledger</option>
+            <option value="General Inquiry">General Inquiry</option>
+        </select>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="emailMessage" style="font-family: Tahoma; font-size: 16px;">Message (max 500 characters):</label>
+        <textarea id="emailMessage" name="message" maxlength="500" style="font-family: Tahoma; font-size: 16px; width: 100%; height: 100px; padding: 5px;" oninput="updateCharCount()" rows="1" cols="20">
+        </textarea>
+        <p id="charCount" style="font-family: Tahoma; font-size: 14px; color: navy;">0/500 characters</p>
+    </div>
+
+    <div style="display: flex; gap: 10px; justify-content: center;">
+        <button class="doc-footer-btn" type="submit"><b>Send Email</b></button>    
+        <button class="doc-footer-btn" onclick="closePopup('emailPopup')"><b>Close</b></button>
+    </div>
+    </form>
+</div>
+<!--End Emailpopup-->      					
+
+<!-- Confirmation popup-->
+<div id="confirmationPopup" role="dialog" aria-modal="true" style="display: none; position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: white; padding: 20px; border: 2px solid navy; z-index: 200; width: 90%; max-width: 300px; border-radius: 12px;">
+    <p style="font-family: Tahoma; font-size: 18px; margin: 10px 0; text-align: center;">Your message has been sent!</p>
+    <div style="display: flex; justify-content: center;">
+        <button class="doc-footer-btn" onclick="closePopup('confirmationPopup')"><b>Close</b></button>
+    </div>
+</div>
+<!-- End confirmation Popup--> 
+
+
+
+<footer>
+	<div style="display: flex; gap: 20px; justify-content: center; margin:10px 10px; flex-wrap: wrap; font-size:0.8rem; color:#666; align-content:center;">
+	  	<p style="font-size:0.8rem;"><b>Global Forex Treasury | <!--Open Source |--> No Jurisdiction | Trade at Own Risk</b></p>
+	    <p style="cursor: pointer; margin: 0;" onclick="openDocModal('docWhitepaperModal')"><u><b>White paper</b></u></p>
+	    <p style="cursor: pointer; margin: 0;" onclick="openDocModal('docWarningModal')"><u><b>T&C & Warning</b></u></p>
+	    <p style="cursor: pointer; margin: 0;" onclick="openPopup('emailPopup')"><u><b>Contact Us</b></u></p>
+    
+    
+  		<!--<p style="text-align:center; margin:15px 0; font-size:0.8rem;">-->
+	    <!--<button class="doc-footer-btn" onclick="openDocModal('docWhitepaperModal')">White Paper</button>-->
+	    <!--<button class="doc-footer-btn" onclick="openDocModal('docWarningModal')">T&C & Warning</button>-->
+	    <!--<button class="doc-footer-btn" onclick="window.open('mailto:support@globalforextreasury.com')">Contact Us</button>-->
+	</div>
+	<div style="display: flex; gap: 20px; text-align:center; margin: 10px 10px; flex-wrap: wrap; font-size:0.8rem; color:#666;">    	
+	  	<p>Copyright 2025 Global Forex Treasury</p>
+		<!-- Global Forex Treasury - Open Source under MIT License -->
+	  	<!-- === MIT LICENSE NOTICE === -->
+	  	<!--<p style="font-size:0.8rem; color:#555; line-height:1.4; text-align:center; margin:10px 0;">
+	    © 2025 <strong>Global Forex Treasury</strong><br>
+	    Open Source under the <a href="LICENSE" target="_blank" style="color:#0066cc; text-decoration:underline;">MIT License</a><br>
+	    No jurisdiction • No custody • Trade at your own risk
+	  	</p>-->
+	</div>  	
+</footer>
+
+<!--===ALL JAVA SCRIPTING===-->
+<script>
+/* ---------- WALLET ---------- */
+let walletAddress = null;
+document.getElementById('walletBtn').onclick = async () => {
+  if (!window.xrpl) { alert('XRPL lib not loaded'); return; }
+  try {
+    const client = new xrpl.Client('wss://s1.ripple.com');
+    await client.connect();
+    const seed = prompt('Enter XRP secret (optional):') || '';
+    const wallet = seed ? xrpl.Wallet.fromSeed(seed) : null;
+    walletAddress = wallet ? wallet.classicAddress : null;
+    document.getElementById('walletStatus').textContent = 
+      walletAddress ? `Connected: ${walletAddress.slice(0,8)}...${walletAddress.slice(-6)}` : 'Not connected';
+    client.disconnect();
+  } catch(e){ alert('Connection failed'); }
+};
+
+/* ---------- TOGGLE DETAILS ---------- */
+function toggleDetails(el) {
+  const details = el.nextElementSibling;
+  details.classList.toggle('show');
+  el.textContent = details.classList.contains('show') ? 'Read Less' : 'Read More (Math)';
+}
+
+/* ---------- CURRENCY DATA ---------- */
+const currencies = [
+  	// === EXOTICS REVALUATION (5.2%) ===
+	{name:"Vietnamese Dong",code:"VND",issuer:"rVND123",pair:"VND/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/vn.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Vietnam_%28orthographic_projection%29.svg/330px-Vietnam_%28orthographic_projection%29.svg.png",country:"Vietnam",iso:"VN",iso4217:"VND",dates:"1978 - present",lastUSD:"0.00004",backing:"Managed Float",history:"Post-war devaluation; rumored RV due to export growth.",histValue:0.00014,endYear:1978,growthRate:0.052},
+	{name:"Iraqi Dinar(Saddam Era)",code:"IQD",issuer:"rIQD456",pair:"IQD/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/iq.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Iraq_%28orthographic%29.svg/250px-Iraq_%28orthographic%29.svg.png",country:"Iraq",iso:"IQ",iso4217:"IQD",dates:"1990 - present",lastUSD:"0.00076",backing:"Oil Peg",history:"Pre-war strong; sanctions/wars caused fall; RV rumors persist.",histValue:0.33,endYear:1990,growthRate:0.052,slogan:"The Revaluation Lives On"},
+	{name:"Indonesian Rupiah",code:"IDR",issuer:"rIDR789",pair:"IDR/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/id.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Indonesia_%28orthographic_projection%29.svg/250px-Indonesia_%28orthographic_projection%29.svg.png",country:"Indonesia",iso:"ID",iso4217:"IDR",dates:"1997 - present",lastUSD:"0.000065",backing:"USD Peg",history:"Asian crisis devalued 80%; RV speculation on commodities.",histValue:0.00042,endYear:1997,growthRate:0.052},
+	{name:"Iranian Rial",code:"IRR",issuer:"rIRR101",pair:"IRR/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/ir.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Iran_%28orthographic_projection%29.svg/250px-Iran_%28orthographic_projection%29.svg.png",country:"Iran",iso:"IR",iso4217:"IRR",dates:"1979 - present",lastUSD:"0.000024",backing:"Oil",history:"Revolution led to sanctions; hyper devaluation rumors.",histValue:0.0143,endYear:1979,growthRate:0.052},
+	{name:"Venezuelan Bolivar Fuerte",code:"VEF",issuer:"rVEF202",pair:"VEF/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/ve.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Venezuela_Orthographic_Map.svg/250px-Venezuela_Orthographic_Map.svg.png",country:"Venezuela",iso:"VE",iso4217:"VEF",dates:"2010 - present",lastUSD:"0.23",backing:"Oil",history:"Hyperinflation from unrest; RV hype on reserves.",histValue:0.23,endYear:2010,growthRate:0.052},
+	{name:"Zimbabwe Dollar (2008 Hyper)",code:"ZWD",issuer:"rZWD303",pair:"ZWD/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/zw.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Zimbabwe_%28orthographic_projection%29.svg/250px-Zimbabwe_%28orthographic_projection%29.svg.png",country:"Zimbabwe",iso:"ZW",iso4217:"ZWD",dates:"2008",lastUSD:"0.00000003",backing:"None (Hyper)",history:"100T note issued; peak inflation 79.6B%; RV rumors post-dollarization.",histValue:0.00000003,endYear:2008,growthRate:0.052},
+	{name:"Thai Baht",code:"THB",issuer:"rTHB404",pair:"THB/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/th.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Thailand_%28orthographic_projection%29.svg/330px-Thailand_%28orthographic_projection%29.svg.png",country:"Thailand",iso:"TH",iso4217:"THB",dates:"1997 - present",lastUSD:"0.028",backing:"Managed Float",history:"Asian crisis survivor; RV speculation on tourism boom.",histValue:0.03,endYear:1997,growthRate:0.052,hidden:true},
+	{name:"Malaysian Ringgit",code:"MYR",issuer:"rMYR505",pair:"MYR/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/my.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Malaysia_%28orthographic_projection%29.svg/250px-Malaysia_%28orthographic_projection%29.svg.png",country:"Malaysia",iso:"MY",iso4217:"MYR",dates:"1998 - present",lastUSD:"0.23",backing:"USD Peg",history:"1998 crisis peg; rumored uplift on oil/palm.",histValue:0.26,endYear:1998,growthRate:0.052,hidden:true},
+	{name:"Philippine Peso",code:"PHP",issuer:"rPHP606",pair:"PHP/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/ph.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/PHL_orthographic.svg/250px-PHL_orthographic.svg.png",country:"Philippines",iso:"PH",iso4217:"PHP",dates:"1998 - present",lastUSD:"0.04",backing:"Managed Float",history:"Asian crisis deval; RV on remittances.",histValue:0.02,endYear:1998,growthRate:0.052,hidden:true},
+	{name:"Korean Won",code:"KRW",issuer:"rKRW707",pair:"KRW/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/kr.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Republic_of_Korea_%28orthographic_projection%29.svg/250px-Republic_of_Korea_%28orthographic_projection%29.svg.png",country:"South Korea",iso:"KR",iso4217:"KRW",dates:"1997 - present",lastUSD:"0.0009",backing:"Float",history:"1997 IMF crisis; rumored reval on tech exports.",histValue:0.0008,endYear:1997,growthRate:0.052,hidden:true},
+	{name:"Argentine Peso",code:"ARS",issuer:"rARS808",pair:"ARS/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/ar.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Argentina_%28including_claimed_territories%2C_orthographic_projection%29.svg/250px-Argentina_%28including_claimed_territories%2C_orthographic_projection%29.svg.png",country:"Argentina",iso:"AR",iso4217:"ARS",dates:"2001 - present",lastUSD:"0.001",backing:"USD Peg Collapse",history:"2001 default; chronic RV rumors.",histValue:1.00,endYear:2001,growthRate:0.052},
+	{name:"Turkish Lira",code:"TRY",issuer:"rTRY909",pair:"TRY/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/tr.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Turkey_%28orthographic_projection%29.svg/250px-Turkey_%28orthographic_projection%29.svg.png",country:"Turkey",iso:"TR",iso4217:"TRY",dates:"2005 - present",lastUSD:"0.03",backing:"Inflation Prone",history:"Post - 2005 reform; RV on geopolitics.",histValue:0.0015,endYear:2005,growthRate:0.052,hidden:true},
+   
+  	// === SOUTHERN AFRICA ACCORD (6.0%) ===
+	{name:"Oranje Dollar",code:"ORD",issuer:"rORD7272",pair:"ORD/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Location_map_of_Orange_Free_State.svg/250px-Location_map_of_Orange_Free_State.svg.png",country:"Oranje",iso:"OR",iso4217:"ORD",dates:"2025+",lastUSD:"0.10",backing:"Gold, maize, wheat, uranium",history:"New accord; Boer heritage revival.",histValue:0.10,endYear:2025,growthRate:0.060,slogan:"New Dawn for Southern Africa"},
+	{name:"Kaapland Dollar",code:"KAD",issuer:"rKAD7373",pair:"KAD/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Map_of_Cape_Colony_in_1896.svg/250px-Map_of_Cape_Colony_in_1896.svg.png",country:"Kaapland",iso:"KA",iso4217:"KAD",dates:"2025+",lastUSD:"0.15",backing:"Wine, deciduous fruit, tech, tourism",history:"Cape revival; port focus.",histValue:0.15,endYear:2025,growthRate:0.060},
+	{name:"Mzansi Zanzi",code:"MZZ",issuer:"rMZZ7474",pair:"MZZ/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Location_South_Africa.svg/250px-Location_South_Africa.svg.png",country:"Mzansi",iso:"MZ",iso4217:"MZZ",dates:"2025+",lastUSD:"0.20",backing:"Platinum, gold, manufacturing, finance",history:"Rainbow nation core.",histValue:0.20,endYear:2025,growthRate:0.060},
+	{name:"Xhosaland Cedi",code:"XHC",issuer:"rXHC7575",pair:"XHC/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Location_Transkei.svg/250px-Location_Transkei.svg.png",country:"Xhosaland",iso:"XH",iso4217:"XHC",dates:"2025+",lastUSD:"0.12",backing:"Cattle, citrus, eco-tourism",history:"Xhosa cultural strength.",histValue:0.12,endYear:2025,growthRate:0.060},
+	{name:"Zululand Mali",code:"ZUM",issuer:"rZUM7676",pair:"ZUM/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Zululand_1890.png/250px-Zululand_1890.png",country:"Kingdom of Zululand",iso:"ZU",iso4217:"ZUM",dates:"2025+",lastUSD:"0.18",backing:"Sugar cane, coal, eco-tourism",history:"Zulu royal revival.",histValue:0.18,endYear:2025,growthRate:0.060},
+	{name:"Tsongaland Pula",code:"TSP",issuer:"rTSP7777",pair:"TSP/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Tsonga_homeland.png/250px-Tsonga_homeland.png",country:"Tsongaland",iso:"TS",iso4217:"TSP",dates:"2025+",lastUSD:"0.13",backing:"Timber exporting, bananas, cross-border trade, citrus, avocado exports, tourism",history:"Tsonga coastal focus.",histValue:0.13,endYear:2025,growthRate:0.060},
+	{name:"Koisan Khoi",code:"KHK",issuer:"rKHK7878",pair:"KHK/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Khoisan_homelands.png/250px-Khoisan_homelands.png",country:"Koisan Kingdom",iso:"KH",iso4217:"KHK",dates:"2025+",lastUSD:"0.11",backing:"Diamonds, semi-precious stones, solar, San heritage tourism",history:"Khoisan ancient rights.",histValue:0.11,endYear:2025,growthRate:0.060},
+
+  	// === OLD CURRENCIES (4.3%)===
+	{name:"Rhodesian Dollar",code:"RHD",issuer:"rRHD5959",pair:"RHD/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Flag_of_Rhodesia_%281968%E2%80%931979%29.svg/250px-Flag_of_Rhodesia_%281968%E2%80%931979%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Map_of_Rhodesia.png/250px-Map_of_Rhodesia.png",country:"Rhodesia",iso:"RH",iso4217:"RHD",dates:"1970 - 1980",lastUSD:"1.47",backing:"Sterling Peg",history:"UDI sanctions; replaced by ZWD.",histValue:1.47,endYear:1980,growthRate:0.043,slogan:"Lost Empires, Hidden Value"},
+	{name:"Rhodesian Pound(Pre-Dollar)",code:"RHP",issuer:"rRHP6565",pair:"RHP/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Flag_of_Southern_Rhodesia_%281924%E2%80%931964%29.svg/250px-Flag_of_Southern_Rhodesia_%281924%E2%80%931964%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Map_of_Rhodesia.png/250px-Map_of_Rhodesia.png",country:"Rhodesia",iso:"RH",iso4217:"RHP",dates:"1956 - 1970",lastUSD:"2.80",backing:"Sterling",history:"Federation era.",histValue:2.80,endYear:1960,growthRate:0.043},
+	{name:"South African Pound",code:"ZAP",issuer:"rZAP6060",pair:"ZAP/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Flag_of_South_Africa_%281928-1982%29.svg/250px-Flag_of_South_Africa_%281928-1982%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Location_South_Africa.svg/250px-Location_South_Africa.svg.png",country:"South Africa",iso:"ZA",iso4217:"ZAP",dates:"1923 - 1961",lastUSD:"2.40",backing:"Gold",history:"Pre-decimal; apartheid era strength.",histValue:2.40,endYear:1961,growthRate:0.043},
+	{name:"Transvaal Boer Pond",code:"TVP",issuer:"rTVP6262",pair:"TVP/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Flag_of_Transvaal.svg/250px-Flag_of_Transvaal.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Map_of_the_South_African_Republic_%28Transvaal%29_in_1899.svg/250px-Map_of_the_South_African_Republic_%28Transvaal%29_in_1899.svg.png",country:"Transvaal",iso:"TV",iso4217:"TVP",dates:"1892 - 1902",lastUSD:"4.87",backing:"Gold (1oz)",history:"Boer War ended; Kruger gold.",histValue:4.87,endYear:1902,growthRate:0.043},
+	{name:"Confederate Dollar",code:"CSD",issuer:"rCSD6161",pair:"CSD/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Flag_of_the_Confederate_States_%281861%E2%80%931863%29.svg/250px-Flag_of_the_Confederate_States_%281861%E2%80%931863%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Confederate_States_of_America_map.svg/250px-Confederate_States_of_America_map.svg.png",country:"Confederate States",iso:"CS",iso4217:"CSD",dates:"1861 - 1865",lastUSD:"0.0167",backing:"Cotton",history:"Civil War hyperinflation; worthless post-surrender.",histValue:0.0167,endYear:1865,growthRate:0.043},
+	{name:"Hawaiian Dollar",code:"HWD",issuer:"rHWD6363",pair:"HWD/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Flag_of_Hawaii.svg/250px-Flag_of_Hawaii.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Hawaii_in_United_States.svg/250px-Hawaii_in_United_States.svg.png",country:"Hawaii",iso:"HW",iso4217:"HWD",dates:"1884 - 1903",lastUSD:"1.00",backing:"Silver",history:"Kingdom annexation.",histValue:1.00,endYear:1898,growthRate:0.043},
+	{name:"Confederate States Treasury Note",code:"CSTN",issuer:"rCSTN6464",pair:"CSTN/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Flag_of_the_Confederate_States_%281861%E2%80%931863%29.svg/330px-Flag_of_the_Confederate_States_%281861%E2%80%931863%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Confederate_States_of_America_map.svg/250px-Confederate_States_of_America_map.svg.png",country:"Confederate States",iso:"CS",iso4217:"CSTN",dates:"1861 - 1864",lastUSD:"0.33",backing:"Bonds",history:"Early war notes; rapid deval.",histValue:0.33,endYear:1864,growthRate:0.043, hidden:true},
+	{name:"Newfoundland Dollar",code:"NFD",issuer:"rNFD6666",pair:"NFD/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Flag_of_the_Dominion_of_Newfoundland.svg/250px-Flag_of_the_Dominion_of_Newfoundland.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Newfoundland_in_Canada.svg/250px-Newfoundland_in_Canada.svg.png",country:"Newfoundland",iso:"NF",iso4217:"NFD",dates:"1865 - 1949",lastUSD:"1.00",backing:"British Gold",history:"Pre-Confederation.",histValue:1.00,endYear:1949,growthRate:0.043},
+	{name:"Australian Pound(Pre-Decimal)",code:"AUP",issuer:"rAUP6767",pair:"AUP/XRP",group:"old",flag:"https://flagcdn.com/au.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Location_map_Australia.png/250px-Location_map_Australia.png",country:"Australia",iso:"AU",iso4217:"AUP",dates:"1910 - 1966",lastUSD:"2.24",backing:"Gold",history:"Imperial peg.",histValue:2.24,endYear:1966,growthRate:0.043},
+	{name:"Canadian Dollar(Pre-Confed)",code:"CADP",issuer:"rCADP6868",pair:"CADP/XRP",group:"old",flag:"https://flagcdn.com/ca.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Location_Canada.svg/250px-Location_Canada.svg.png",country:"Canada",iso:"CA",iso4217:"CADP",dates:"1858 - 1867",lastUSD:"1.00",backing:"Silver/Gold",history:"Colonial notes.",histValue:1.00,endYear:1867,growthRate:0.043},
+	{name:"British Guiana Dollar",code:"BGD",issuer:"rBGD6969",pair:"BGD/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Flag_of_British_Guiana_%281916%E2%80%931966%29.svg/100px-Flag_of_British_Guiana_%281916%E2%80%931966%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Map_of_British_Guiana_1885.svg/250px-Map_of_British_Guiana_1885.svg.png",country:"British Guiana",iso:"GY",iso4217:"BGD",dates:"1839 - 1966",lastUSD:"0.75",backing:"Sterling",history:"Colonial sugar economy.",histValue:0.75,endYear:1966,growthRate:0.043,hidden:true},
+	{name:"East African Florin",code:"EAF",issuer:"rEAF7070",pair:"EAF/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Flag_of_British_East_Africa.svg/100px-Flag_of_British_East_Africa.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/East_Africa_Protectorate_1920.png/250px-East_Africa_Protectorate_1920.png",country:"East Africa",iso:"EA",iso4217:"EAF",dates:"1920 - 1921",lastUSD:"1.00",backing:"Sterling",history:"Short-lived union.",histValue:1.00,endYear:1921,growthRate:0.043,hidden:true},
+	{name:"Straits Dollar",code:"SSD",issuer:"rSSD7171",pair:"SSD/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Flag_of_the_Strait_Settlements_%28pre-1874%29.svg/100px-Flag_of_the_Strait_Settlements_%28pre-1874%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Map_of_the_Straits_Settlements.svg/250px-Map_of_the_Straits_Settlements.svg.png",country:"Straits Settlements",iso:"SS",iso4217:"SSD",dates:"1903 - 1939",lastUSD:"0.50",backing:"Silver",history:"Trade hub.",histValue:0.50,endYear:1939,growthRate:0.043,hidden:true},
+	{name:"Danish Rigsdaler(Pre-Krone)",code:"DKR",issuer:"rDKR3636",pair:"DKR/XRP",group:"old",flag:"https://flagcdn.com/dk.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Location_Denmark.svg/250px-Location_Denmark.svg.png",country:"Denmark",iso:"DK",iso4217:"DKR",dates:"1813 - 1875",lastUSD:"0.27",backing:"Silver",history:"Pre-union silver coin.",histValue:0.27,endYear:1875,growthRate:0.043,hidden:true},
+	{name:"Swedish Riksdaler(Pre-Krona)",code:"SEDR",issuer:"rSEDR3737",pair:"SEDR/XRP",group:"old",flag:"https://flagcdn.com/se.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Location_Sweden_Europe.svg/250px-Location_Sweden_Europe.svg.png",country:"Sweden",iso:"SE",iso4217:"SEDR",dates:"1776 - 1873",lastUSD:"0.27",backing:"Silver",history:"Pre-gold standard.",histValue:0.27,endYear:1873,growthRate:0.043,hidden:true},
+
+ 	// === UK-SPLIT ===
+  	{name:"England Pound",code:"GBP",issuer:"rGBP001",pair:"GBP/XRP",group:"britania",flag:"https://flagcdn.com/gb-eng.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/England_in_the_UK_and_Europe.svg/250px-England_in_the_UK_and_Europe.svg.png",country:"England (Albion)",iso:"EN",iso4217:"GBP",dates:"1707 - present",lastUSD:"1.27",backing:"Sterling Sovereign",history:"Core of Pound Sterling. What if England minted solo?",histValue:1.50,endYear:1707,growthRate:0.052,slogan:"4 Kingdoms, back to Financial Independance and Wealth"},
+  	{name:"Scottish Pound",code:"SCP",issuer:"rSCP002",pair:"SCP/XRP",group:"britania",flag:"https://flagcdn.com/gb-sct.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Scotland_in_the_UK_and_Europe.svg/250px-Scotland_in_the_UK_and_Europe.svg.png",country:"Scotland (Alba)",iso:"SC",iso4217:"SCP",dates:"2026 - future",lastUSD:"1.30",backing:"Oil & Renewables",history:"Reserved ISO. Alba rising with North Sea wealth.",histValue:1.60,endYear:2026,growthRate:0.052},
+  	{name:"Welsh Cymru",code:"CYW",issuer:"rCYW003",pair:"CYW/XRP",group:"britania",flag:"https://flagcdn.com/gb-wls.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Wales_in_the_United_Kingdom.svg/250px-Wales_in_the_United_Kingdom.svg.png",country:"Wales (Cymru)",iso:"CY",iso4217:"CYW",dates:"2027 - future",lastUSD:"1.25",backing:"Tech & Tourism",history:"Cymru reclaims its coin. Dragon economy awakens.",histValue:1.40,endYear:2027,growthRate:0.052},
+  	{name:"Irish Punt",code:"IEP",issuer:"rIEP004",pair:"IEP/XRP",group:"britania",flag:"https://flagcdn.com/ie.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Location_Ireland.svg/250px-Location_Ireland.svg.png",country:"Ireland (Eire)",iso:"IE",iso4217:"IEP",dates:"2025 - future",lastUSD:"1.35",backing:"Tech & EU Bridge",history:"Eire ditches euro. Punt reborn in green.",histValue:1.27,endYear:2025,growthRate:0.052}, 
+   
+  	// === PRE-EURO (4.1%) ===
+	{name:"Austrian Schilling",code:"ATS",issuer:"rATS3939",pair:"ATS/XRP",group:"pre-euro",flag:"https://flagcdn.com/at.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Location_Austria.svg/250px-Location_Austria.svg.png",country:"Austria",iso:"AT",iso4217:"ATS",dates:"1924–2002",lastUSD:"0.072",backing:"Euro",history:"Post-WWII stability.",histValue:0.013,endYear:1999,growthRate:0.041,slogan:"The Euro Killed the Golden Age - Independence = Prosperity"},
+	{name:"Belgian Franc",code:"BEF",issuer:"rBEF4040",pair:"BEF/XRP",group:"pre-euro",flag:"https://flagcdn.com/be.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Location_Belgium.svg/250px-Location_Belgium.svg.png",country:"Belgium",iso:"BE",iso4217:"BEF",dates:"1832–2002",lastUSD:"0.025",backing:"Euro",history:"Bilingual notes.",histValue:0.04,endYear:1999,growthRate:0.041},
+	{name:"Cypriot Pound",code:"CYP",issuer:"rCYP4141",pair:"CYP/XRP",group:"pre-euro",flag:"https://flagcdn.com/cy.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Location_Cyprus.svg/250px-Location_Cyprus.svg.png",country:"Cyprus",iso:"CY",iso4217:"CYP",dates:"1976–2008",lastUSD:"1.71",backing:"Euro",history:"Island division impact.",histValue:1.71,endYear:2007,growthRate:0.041},
+	{name:"German Deutsche Mark",code:"DEM",issuer:"rDEM4242",pair:"DEM/XRP",group:"pre-euro",flag:"https://flagcdn.com/de.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Location_Germany.svg/250px-Location_Germany.svg.png",country:"Germany",iso:"DE",iso4217:"DEM",dates:"1948–2002",lastUSD:"0.51",backing:"Euro",history:"Post-war miracle.",histValue:1.67,endYear:1999,growthRate:0.041},
+	{name:"Estonian Kroon",code:"EEK",issuer:"rEEK4343",pair:"EEK/XRP",group:"pre-euro",flag:"https://flagcdn.com/ee.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Location_Estonia.svg/250px-Location_Estonia.svg.png",country:"Estonia",iso:"EE",iso4217:"EEK",dates:"1992–2011",lastUSD:"0.16",backing:"Euro Peg",history:"Post-Soviet.",histValue:0.16,endYear:2010,growthRate:0.041,hidden:true},
+	{name:"Finnish Markka",code:"FIM",issuer:"rFIM4444",pair:"FIM/XRP",group:"pre-euro",flag:"https://flagcdn.com/fi.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Location_Finland.svg/250px-Location_Finland.svg.png",country:"Finland",iso:"FI",iso4217:"FIM",dates:"1860–2002",lastUSD:"0.53",backing:"Euro",history:"Nokia era strength.",histValue:5.95,endYear:1999,growthRate:0.041},
+	{name:"French Franc",code:"FRF",issuer:"rFRF4545",pair:"FRF/XRP",group:"pre-euro",flag:"https://flagcdn.com/fr.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Location_France.svg/250px-Location_France.svg.png",country:"France",iso:"FR",iso4217:"FRF",dates:"1360–2002",lastUSD:"0.15",backing:"Euro",history:"Ancient roots.",histValue:6.56,endYear:1999,growthRate:0.041},
+	{name:"Greek Drachma",code:"GRD",issuer:"rGRD4646",pair:"GRD/XRP",group:"pre-euro",flag:"https://flagcdn.com/gr.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Location_Greece.svg/250px-Location_Greece.svg.png",country:"Greece",iso:"GR",iso4217:"GRD",dates:"1832–2002",lastUSD:"0.003",backing:"Euro",history:"Ancient legacy; debt crisis.",histValue:340.75,endYear:1999,growthRate:0.041},
+	{name:"Irish Pound",code:"IEP",issuer:"rIEP4747",pair:"IEP/XRP",group:"pre-euro",flag:"https://flagcdn.com/ie.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Location_Ireland.svg/250px-Location_Ireland.svg.png",country:"Ireland",iso:"IE",iso4217:"IEP",dates:"1928–2002",lastUSD:"1.27",backing:"Euro",history:"Celtic tiger precursor.",histValue:0.79,endYear:1999,growthRate:0.041},
+	{name:"Italian Lira",code:"ITL",issuer:"rITL4848",pair:"ITL/XRP",group:"pre-euro",flag:"https://flagcdn.com/it.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Location_Italy_Europe.png/250px-Location_Italy_Europe.png",country:"Italy",iso:"IT",iso4217:"ITL",dates:"1861–2002",lastUSD:"0.0005",backing:"Euro",history:"Unification currency.",histValue:1936.27,endYear:1999,growthRate:0.041},
+	{name:"Latvian Lat",code:"LVL",issuer:"rLVL4949",pair:"LVL/XRP",group:"pre-euro",flag:"https://flagcdn.com/lv.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Location_Latvia.svg/250px-Location_Latvia.svg.png",country:"Latvia",iso:"LV",iso4217:"LVL",dates:"1993–2014",lastUSD:"1.82",backing:"Euro Peg",history:"Post-Soviet peg.",histValue:0.62,endYear:2013,growthRate:0.041,hidden:true},
+	{name:"Lithuanian Litas",code:"LTL",issuer:"rLTL5050",pair:"LTL/XRP",group:"pre-euro",flag:"https://flagcdn.com/lt.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Location_Lithuania.svg/250px-Location_Lithuania.svg.png",country:"Lithuania",iso:"LT",iso4217:"LTL",dates:"1993–2015",lastUSD:"0.36",backing:"Euro Peg",history:"Basket peg.",histValue:3.45,endYear:2014,growthRate:0.041,hidden:true},
+	{name:"Luxembourg Franc",code:"LUF",issuer:"rLUF5151",pair:"LUF/XRP",group:"pre-euro",flag:"https://flagcdn.com/lu.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Location_Luxembourg.svg/250px-Location_Luxembourg.svg.png",country:"Luxembourg",iso:"LU",iso4217:"LUF",dates:"1944–2002",lastUSD:"0.025",backing:"Euro",history:"Tied to Belgian Franc.",histValue:40.34,endYear:1999,growthRate:0.041},
+	{name:"Maltese Lira",code:"MTL",issuer:"rMTL5252",pair:"MTL/XRP",group:"pre-euro",flag:"https://flagcdn.com/mt.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Location_Malta.svg/250px-Location_Malta.svg.png",country:"Malta",iso:"MT",iso4217:"MTL",dates:"1972–2008",lastUSD:"2.11",backing:"Euro",history:"Island pound successor.",histValue:0.43,endYear:2007,growthRate:0.041},
+	{name:"Dutch Guilder",code:"NLG",issuer:"rNLG5353",pair:"NLG/XRP",group:"pre-euro",flag:"https://flagcdn.com/nl.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Location_Netherlands.svg/250px-Location_Netherlands.svg.png",country:"Netherlands",iso:"NL",iso4217:"NLG",dates:"1816–2002",lastUSD:"0.45",backing:"Euro",history:"VOC legacy.",histValue:2.20,endYear:1999,growthRate:0.041},
+	{name:"Portuguese Escudo",code:"PTE",issuer:"rPTE5454",pair:"PTE/XRP",group:"pre-euro",flag:"https://flagcdn.com/pt.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Location_Portugal_Europe.png/250px-Location_Portugal_Europe.png",country:"Portugal",iso:"PT",iso4217:"PTE",dates:"1911–2002",lastUSD:"0.005",backing:"Euro",history:"Colonial wars weakened.",histValue:200.48,endYear:1999,growthRate:0.041},
+	{name:"Slovak Koruna",code:"SKK",issuer:"rSKK5555",pair:"SKK/XRP",group:"pre-euro",flag:"https://flagcdn.com/sk.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Location_Slovakia.svg/250px-Location_Slovakia.svg.png",country:"Slovakia",iso:"SK",iso4217:"SKK",dates:"1993–2009",lastUSD:"0.037",backing:"Euro Peg",history:"Post-split.",histValue:30.13,endYear:2008,growthRate:0.041,hidden:true},
+	{name:"Slovenian Tolar",code:"SIT",issuer:"rSIT5656",pair:"SIT/XRP",group:"pre-euro",flag:"https://flagcdn.com/si.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Location_Slovenia.svg/250px-Location_Slovenia.svg.png",country:"Slovenia",iso:"SI",iso4217:"SIT",dates:"1991–2007",lastUSD:"0.005",backing:"Euro Peg",history:"Independence currency.",histValue:239.64,endYear:2006,growthRate:0.041,hidden:true},
+	{name:"Spanish Peseta",code:"ESP",issuer:"rESP5757",pair:"ESP/XRP",group:"pre-euro",flag:"https://flagcdn.com/es.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Location_Spain_Europe.png/250px-Location_Spain_Europe.png",country:"Spain",iso:"ES",iso4217:"ESP",dates:"1868–2002",lastUSD:"0.006",backing:"Euro",history:"Franco era to boom.",histValue:166.39,endYear:1999,growthRate:0.041},
+	{name:"Vatican Lira",code:"VAL",issuer:"rVAL5858",pair:"VAL/XRP",group:"pre-euro",flag:"https://flagcdn.com/va.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Location_Vatican_City.svg/250px-Location_Vatican_City.svg.png",country:"Vatican",iso:"VA",iso4217:"VAL",dates:"1929–2002",lastUSD:"0.0005",backing:"Euro",history:"Holy See tied to Italy.",histValue:1936.27,endYear:1999,growthRate:0.041,hidden:true},
+
+	// === NORTH AMERICAN MAINLAND (5.0%) ===
+	{name:"US  Dollar",code:"USD",issuer:"rUSD001",pair:"USD/XRP",group:"america",flag:"https://flagcdn.com/us.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ a/a4/Location_map_United_States.png/250px-Location_map_United_States.png",country:"United States",iso:"US",iso4217:"USD",dates:"1792– present",lastUSD:"1.00",backing:"Fiat Reserve",history:"Global reserve since Bretton Woods.",histValue:1.00,endYear:1971,growthRate:0.050},
+	{name:"Canadian  Dollar",code:"CAD",issuer:"rCAD002",pair:"CAD/XRP",group:"america",flag:"https://flagcdn.com/ca.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ d/dd/Location_Canada.svg/250px-Location_Canada.svg.png",country:"Canada",iso:"CA",iso4217:"CAD",dates:"1858–present",lastUSD:"0.74",backing:"Oil &  Resources",history:"Loonie tied to commodities.",histValue:1.00,endYear:1971,growthRate:0.050},
+	{name:"Mexican  Peso",code:"MXN",issuer:"rMXN003",pair:"MXN/XRP",group:"america",flag:"https://flagcdn.com/mx.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/f /fc/Location_Mexico.svg/250px-Location_Mexico.svg.png",country:"Mexico",iso:"MX",iso4217:"MXN",dates:"1993–present",lastUSD:"0.050",backing:"Oil &  Remittances",history:"Post-NAFTA.",histValue:0.33,endYear:1993,growthRate:0.050},
+	{name:"Yukon Dollar",code:"YUD",issuer:"rYUD004",pair:"YUD/XRP",group:"america",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Flag_of_Yukon.svg/250px-Flag_of_Yukon.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Location_Yukon.svg/250px-Location_Yukon.svg.png",country:"Yukon  Territory",iso:"YT",iso4217:"YUD",dates:"2026+",lastUSD:"0.80",backing:"Gold & Mining",history:"Northern autonomy.",histValue:0.80,endYear:2026,growthRate:0.050},
+	{name:"Hawaiian  Dollar",code:"HWD",issuer:"rHWD005",pair:"HWD/XRP",group:"america",flag:"https://flagcdn.com/us.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb /e/ef/Location_Hawaii.svg/250px-Location_Hawaii.svg.png",country:"Hawaii",iso:"HI",iso4217:"HWD",dates:"2026+",lastUSD:"1.10",backing:"Tourism &  Tech",history:"Pacific hub.",histValue:1.10,endYear:2026,growthRate:0.050},
+
+	// === LATIN AMERICA (6.0%) ===
+	{name:"Guatemalan  Quetzal",code:"GTQ",issuer:"rGTQ101",pair:"GTQ/XRP",group:"latam",flag:"https://flagcdn.com/gt.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e c/Location_Guatemala.svg/250px-Location_Guatemala.svg.png",country:"Guatemala",iso:"GT",iso4217:"GTQ",dates:"1925– present",lastUSD:"0.13",backing:"Coffee",history:"Stable despite civil war.",histValue:1.00,endYear:1925,growthRate:0.060,hidden:true},
+	{name:"Belize  Dollar",code:"BZD",issuer:"rBZD102",pair:"BZD/XRP",group:"latam",flag:"https://flagcdn.com/bz.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c /Location_Belize.svg/250px-Location_Belize.svg.png",country:"Belize",iso:"BZ",iso4217:"BZD",dates:"1973– present",lastUSD:"0.50",backing:"Tourism",history:"Caribbean gateway.",histValue:0.50,endYear:1973,growthRate:0.060},
+	{name:"Honduran  Lempira",code:"HNL",issuer:"rHNL103",pair:"HNL/XRP",group:"latam",flag:"https://flagcdn.com/hn.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/ 82/Location_Honduras.svg/250px-Location_Honduras.svg.png",country:"Honduras",iso:"HN",iso4217:"HNL",dates:"1931– present",lastUSD:"0.041",backing:"Coffee",history:"Banana republic legacy.",histValue:0.50,endYear:1931,growthRate:0.060,hidden:true},
+	{name:"Salvadoran  Colón",code:"SVC",issuer:"rSVC104",pair:"SVC/XRP",group:"latam",flag:"https://flagcdn.com/sv.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3 4/Location_El_Salvador.svg/250px-Location_El_Salvador.svg.png",country:"El Salvador",iso:"SV",iso4217:"SVC",dates:"2001–present",lastUSD:"0.11",backing:"USD  Peg",history:"Bitcoin nation.",histValue:0.11,endYear:2001,growthRate:0.060,hidden:true},
+	{name:"Nicaraguan  Córdoba",code:"NIO",issuer:"rNIO105",pair:"NIO/XRP",group:"latam",flag:"https://flagcdn.com/ni.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/19 /Location_Nicaragua.svg/250px-Location_Nicaragua.svg.png",country:"Nicaragua",iso:"NI",iso4217:"NIO",dates:"1912– present",lastUSD:"0.028",backing:"Coffee",history:"Canal dreams.",histValue:1.00,endYear:1912,growthRate:0.060,hidden:true},
+	{name:"Costa Rican  Colón",code:"CRC",issuer:"rCRC106",pair:"CRC/XRP",group:"latam",flag:"https://flagcdn.com/cr.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/ Location_Costa_Rica.svg/250px-Location_Costa_Rica.svg.png",country:"Costa Rica",iso:"CR",iso4217:"CRC",dates:"1896– present",lastUSD:"0.0017",backing:"Tourism",history:"Eco-dollar.",histValue:0.14,endYear:1896,growthRate:0.060},
+	{name:"Panamanian  Balboa",code:"PAB",issuer:"rPAB107",pair:"PAB/XRP",group:"latam",flag:"https://flagcdn.com/pa.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a b/Location_Panama.svg/250px-Location_Panama.svg.png",country:"Panama",iso:"PA",iso4217:"PAB",dates:"1904–present",lastUSD:"1.00",backing:"USD  Peg",history:"Canal economy.",histValue:1.00,endYear:1904,growthRate:0.060},
+	{name:"Colombian  Peso",code:"COP",issuer:"rCOP108",pair:"COP/XRP",group:"latam",flag:"https://flagcdn.com/co.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2 1/Location_Colombia.svg/250px-Location_Colombia.svg.png",country:"Colombia",iso:"CO",iso4217:"COP",dates:"1871–present",lastUSD:"0.00025",backing:"Oil &  Coffee",history:"Emerging giant.",histValue:0.0005,endYear:1871,growthRate:0.060},
+	{name:"Venezuelan  Bolívar",code:"VES",issuer:"rVES109",pair:"VES/XRP",group:"latam",flag:"https://flagcdn.com/ve.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0 6/Location_Venezuela.svg/250px-Location_Venezuela.svg.png",country:"Venezuela",iso:"VE",iso4217:"VES",dates:"2018– present",lastUSD:"0.00003",backing:"Oil",history:"Hyperinflation.",histValue:0.23,endYear:2010,growthRate:0.060},
+	{name:"Guyanese  Dollar",code:"GYD",issuer:"rGYD110",pair:"GYD/XRP",group:"latam",flag:"https://flagcdn.com/gy.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/99 /Location_Guyana.svg/250px-Location_Guyana.svg.png",country:"Guyana",iso:"GY",iso4217:"GYD",dates:"1966–present",lastUSD:"0.0048",backing:"Oil  Boom",history:"Exxon discovery.",histValue:0.0048,endYear:1966,growthRate:0.060,hidden:true},
+	{name:"Surinamese  Dollar",code:"SRD",issuer:"rSRD111",pair:"SRD/XRP",group:"latam",flag:"https://flagcdn.com/sr.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/60 /Location_Suriname.svg/250px-Location_Suriname.svg.png",country:"Suriname",iso:"SR",iso4217:"SRD",dates:"2004–present",lastUSD:"0.035",backing:"Gold &  Oil",history:"Dutch heritage.",histValue:0.035,endYear:2004,growthRate:0.060,hidden:true},
+	{name:"French Guianese  Euro",code:"EUR",issuer:"rEUR112",pair:"EUR/XRP",group:"latam",flag:"https://flagcdn.com/gf.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/ Location_French_Guiana.svg/250px-Location_French_Guiana.svg.png",country:"French Guiana",iso:"GF",iso4217:"EUR",dates:"2002– present",lastUSD:"1.08",backing:"EU",history:"Space hub.",histValue:1.17,endYear:2002,growthRate:0.060,hidden:true},
+	{name:"Ecuadorian  Dollar",code:"USD",issuer:"rUSD113",pair:"USD/XRP",group:"latam",flag:"https://flagcdn.com/ec.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e 8/Location_Ecuador.svg/250px-Location_Ecuador.svg.png",country:"Ecuador",iso:"EC",iso4217:"USD",dates:"2000–present",lastUSD:"1.00",backing:"USD  Peg",history:"Dollarized.",histValue:1.00,endYear:2000,growthRate:0.060},
+	{name:"Peruvian  Sol",code:"PEN",issuer:"rPEN114",pair:"PEN/XRP",group:"latam",flag:"https://flagcdn.com/pe.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Lo cation_Peru.svg/250px-Location_Peru.svg.png",country:"Peru",iso:"PE",iso4217:"PEN",dates:"1991–present",lastUSD:"0.27",backing:"Copper",history:"Inca  legacy.",histValue:0.33,endYear:1991,growthRate:0.060},
+	{name:"Brazilian  Real",code:"BRL",issuer:"rBRL115",pair:"BRL/XRP",group:"latam",flag:"https://flagcdn.com/br.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/L ocation_Brazil.svg/250px-Location_Brazil.svg.png",country:"Brazil",iso:"BR",iso4217:"BRL",dates:"1994– present",lastUSD:"0.18",backing:"Commodities",history:"BRICS leader.",histValue:1.00,endYear:1994,growthRate:0.060},
+	{name:"Bolivian  Boliviano",code:"BOB",issuer:"rBOB116",pair:"BOB/XRP",group:"latam",flag:"https://flagcdn.com/bo.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ 4/48/Location_Bolivia.svg/250px-Location_Bolivia.svg.png",country:"Bolivia",iso:"BO",iso4217:"BOB",dates:"1987– present",lastUSD:"0.14",backing:"Gas",history:"Andean.",histValue:0.14,endYear:1987,growthRate:0.060},
+	{name:"Paraguayan  Guaraní",code:"PYG",issuer:"rPYG117",pair:"PYG/XRP",group:"latam",flag:"https://flagcdn.com/py.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2 7/Location_Paraguay.svg/250px-Location_Paraguay.svg.png",country:"Par Selling",iso:"PY",iso4217:"PYG",dates:"1944– present",lastUSD:"0.00014",backing:"Soy",history:"Mercosur.",histValue:0.00014,endYear:1944,growthRate:0.060},
+	{name:"Uruguayan  Peso",code:"UYU",issuer:"rUYU118",pair:"UYU/XRP",group:"latam",flag:"https://flagcdn.com/uy.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Lo cation_Uruguay.svg/250px-Location_Uruguay.svg.png",country:"Uruguay",iso:"UY",iso4217:"UYU",dates:"1993– present",lastUSD:"0.024",backing:"Beef",history:"Progressive.",histValue:0.024,endYear:1993,growthRate:0.060},
+	{name:"Argentine  Peso",code:"ARS",issuer:"rARS119",pair:"ARS/XRP",group:"latam",flag:"https://flagcdn.com/ar.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/ Location_Argentina.svg/250px-Location_Argentina.svg.png",country:"Argentina",iso:"AR",iso4217:"ARS",dates:"2001– present",lastUSD:"0.001",backing:"Soy",history:"Chronic RV rumors.",histValue:1.00,endYear:2001,growthRate:0.060},
+	{name:"Chilean  Peso",code:"CLP",issuer:"rCLP120",pair:"CLP/XRP",group:"latam",flag:"https://flagcdn.com/cl.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/ Location_Chile.svg/250px-Location_Chile.svg.png",country:"Chile",iso:"CL",iso4217:"CLP",dates:"1975–present",lastUSD:"0.0011",backing:"Copper",history:"Andean  powerhouse.",histValue:0.0011,endYear:1975,growthRate:0.060},
+	
+	// === CARIBBEAN BASIN (5.5%) ===
+	{name:"Cuban  Peso",code:"CUP",issuer:"rCUP201",pair:"CUP/XRP",group:"caribbean",flag:"https://flagcdn.com/cu.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb /b/bd/Location_Cuba.svg/250px-Location_Cuba.svg.png",country:"Cuba",iso:"CU",iso4217:"CUP",dates:"1994–present",lastUSD:"0.04",backing:"State  Control",history:"Dual currency.",histValue:1.00,endYear:1994,growthRate:0.055},
+	{name:"Jamaican  Dollar",code:"JMD",issuer:"rJMD202",pair:"JMD/XRP",group:"caribbean",flag:"https://flagcdn.com/jm.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb /0/0a/Location_Jamaica.svg/250px-Location_Jamaica.svg.png",country:"Jamaica",iso:"JM",iso4217:"JMD",dates:"1969– present",lastUSD:"0.0065",backing:"Bauxite",history:"Reggae economy.",histValue:0.83,endYear:1969,growthRate:0.055},
+	{name:"Haitian  Gourde",code:"HTG",issuer:"rHTG203",pair:"HTG/XRP",group:"caribbean",flag:"https://flagcdn.com/ht.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thum b/5/56/Location_Haiti.svg/250px-Location_Haiti.svg.png",country:"Haiti",iso:"HT",iso4217:"HTG",dates:"1872– present",lastUSD:"0.0075",backing:"Remittances",history:"Revolution legacy.",histValue:0.20,endYear:1872,growthRate:0.055,hidden:true},
+	{name:"Dominican  Peso",code:"DOP",issuer:"rDOP204",pair:"DOP/XRP",group:"caribbean",flag:"https://flagcdn.com/do.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thum b/9/9f/Location_Dominican_Republic.svg/250px-Location_Dominican_Republic.svg.png",country:"Dominican Republic",iso:"DO",iso4217:"DOP",dates:"1947– present",lastUSD:"0.017",backing:"Tourism",history:"Caribbean twin.",histValue:0.017,endYear:1947,growthRate:0.055,hidden:true},
+	{name:"Puerto Rican  Dollar",code:"PRD",issuer:"rPRD205",pair:"PRD/XRP",group:"caribbean",flag:"https://flagcdn.com/pr.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb /2/28/Location_Puerto_Rico.svg/250px-Location_Puerto_Rico.svg.png",country:"Puerto Rico",iso:"PR",iso4217:"PRD",dates:"2026+",lastUSD:"1.00",backing:"USD  Peg",history:"Island autonomy.",histValue:1.00,endYear:2026,growthRate:0.055},
+	{name:"Bahamian  Dollar",code:"BSD",issuer:"rBSD206",pair:"BSD/XRP",group:"caribbean",flag:"https://flagcdn.com/bs.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thum b/9/93/Location_Bahamas.svg/250px-Location_Bahamas.svg.png",country:"Bahamas",iso:"BS",iso4217:"BSD",dates:"1966–present",lastUSD:"1.00",backing:"USD  Peg",history:"Tax haven.",histValue:1.00,endYear:1966,growthRate:0.055},
+	{name:"Barbadian  Dollar",code:"BBD",issuer:"rBBD207",pair:"BBD/XRP",group:"caribbean",flag:"https://flagcdn.com/bb.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thum b/e/ef/Location_Barbados.svg/250px-Location_Barbados.svg.png",country:"Barbados",iso:"BB",iso4217:"BBD",dates:"1973– present",lastUSD:"0.50",backing:"Tourism",history:"Rihanna island.",histValue:0.50,endYear:1973,growthRate:0.055},
+	{name:"Trinidadian  Dollar",code:"TTD",issuer:"rTTD208",pair:"TTD/XRP",group:"caribbean",flag:"https://flagcdn.com/tt.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/ 64/Location_Trinidad_and_Tobago.svg/250px-Location_Trinidad_and_Tobago.svg.png",country:"Trinidad and Tobago",iso:"TT",iso4217:"TTD",dates:"1964– present",lastUSD:"0.15",backing:"Oil & Gas",history:"Carnival energy.",histValue:0.15,endYear:1964,growthRate:0.055},
+	{name:"Antiguan  Dollar",code:"XCD",issuer:"rXCD209",pair:"XCD/XRP",group:"caribbean",flag:"https://flagcdn.com/ag.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thum b/8/89/Location_Antigua_and_Barbuda.svg/250px-Location_Antigua_and_Barbuda.svg.png",country:"Antigua and Barbuda",iso:"AG",iso4217:"XCD",dates:"1965– present",lastUSD:"0.37",backing:"Tourism",history:"EC currency.",histValue:0.37,endYear:1965,growthRate:0.055},
+	{name:"Saint Lucian  Dollar",code:"XCD",issuer:"rXCD210",pair:"XCD/XRP",group:"caribbean",flag:"https://flagcdn.com/lc.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb /9/9f/Location_Saint_Lucia.svg/250px-Location_Saint_Lucia.svg.png",country:"Saint Lucia",iso:"LC",iso4217:"XCD",dates:"1965– present",lastUSD:"0.37",backing:"Tourism",history:"Pitons.",histValue:0.37,endYear:1965,growthRate:0.055},
+	{name:"Saint Vincentian  Dollar",code:"XCD",issuer:"rXCD211",pair:"XCD/XRP",group:"caribbean",flag:"https://flagcdn.com/vc.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thum b/6/6d/Location_Saint_Vincent_and_the_Grenadines.svg/250px-Location_Saint_Vincent_and_the_Grenadines.svg.png",country:"Saint Vincent and the  Grenadines",iso:"VC",iso4217:"XCD",dates:"1965–present",lastUSD:"0.37",backing:"Tourism",history:"Volcano  island.",histValue:0.37,endYear:1965,growthRate:0.055},
+	{name:"Grenadian  Dollar",code:"XCD",issuer:"rXCD212",pair:"XCD/XRP",group:"caribbean",flag:"https://flagcdn.com/gd.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thum b/b/bc/Location_Grenada.svg/250px-Location_Grenada.svg.png",country:"Grenada",iso:"GD",iso4217:"XCD",dates:"1965– present",lastUSD:"0.37",backing:"Spice",history:"Nutmeg.",histValue:0.37,endYear:1965,growthRate:0.055},
+	{name:"Dominican  Dollar",code:"XCD",issuer:"rXCD213",pair:"XCD/XRP",group:"caribbean",flag:"https://flagcdn.com/dm.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thu mb/c/c4/Location_Dominica.svg/250px-Location_Dominica.svg.png",country:"Dominica",iso:"DM",iso4217:"XCD",dates:"1965–present",lastUSD:"0.37",backing:"Eco- tourism",history:"Nature isle.",histValue:0.37,endYear:1965,growthRate:0.055},
+	{name:"Kittitian  Dollar",code:"XCD",issuer:"rXCD214",pair:"XCD/XRP",group:"caribbean",flag:"https://flagcdn.com/kn.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thum b/f/fe/Location_Saint_Kitts_and_Nevis.svg/250px-Location_Saint_Kitts_and_Nevis.svg.png",country:"Saint Kitts and Nevis",iso:"KN",iso4217:"XCD",dates:"1965– present",lastUSD:"0.37",backing:"Citizenship",history:"Twin islands.",histValue:0.37,endYear:1965,growthRate:0.055},
+	
+  	// === SADAC (4.8%) ===
+	{name:"Angolan  Kwanza",code:"AOA",issuer:"rAOA1010",pair:"AOA/XRP",group:"sadac",flag:"https://flagcdn.com/ao.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb /0/01/Location_Angola.svg/250px-Location_Angola.svg.png",country:"Angola",iso:"AO",iso4217:"AOA",dates:"1977– present",lastUSD:"0.0012",backing:"Oil",history:"Post-independence; civil war devalued.",histValue:0.03,endYear:1977,growthRate:0.048,slogan:"Resource  Powerhouse of Africa"},
+	{name:"Botswana  Pula",code:"BWP",issuer:"rBWP1111",pair:"BWP/XRP",group:"sadac",flag:"https://flagcdn.com/bw.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f a/Location_Botswana.svg/250px-Location_Botswana.svg.png",country:"Botswana",iso:"BW",iso4217:"BWP",dates:"1976– present",lastUSD:"0.074",backing:"Diamonds",history:"Stable growth; mining backed.",histValue:0.12,endYear:1976,growthRate:0.048},
+	{name:"Comorian  Franc",code:"KMF",issuer:"rKMF1212",pair:"KMF/XRP",group:"sadac",flag:"https://flagcdn.com/km.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/1 /1b/Location_Comoros.svg/250px-Location_Comoros.svg.png",country:"Comoros",iso:"KM",iso4217:"KMF",dates:"1979–present",lastUSD:"0.0022",backing:"Euro  Peg",history:"Island volatility; French ties.",histValue:0.0025,endYear:1979,growthRate:0.048},
+	{name:"DRC  Franc",code:"CDF",issuer:"rCDF1313",pair:"CDF/XRP",group:"sadac",flag:"https://flagcdn.com/cd.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/ 6c/Location_DRC.svg/250px-Location_DRC.svg.png",country:"DR Congo",iso:"CD",iso4217:"CDF",dates:"1997– present",lastUSD:"0.00055",backing:"Minerals",history:"War-torn; hyperinflation history.",histValue:0.001,endYear:1997,growthRate:0.048},
+	{name:"Eswatini  Lilangeni",code:"SZL",issuer:"rSZL1414",pair:"SZL/XRP",group:"sadac",flag:"https://flagcdn.com/sz.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ e/e1/Location_Eswatini.svg/250px-Location_Eswatini.svg.png",country:"Eswatini",iso:"SZ",iso4217:"SZL",dates:"1974–present",lastUSD:"0.056",backing:"ZAR  Peg",history:"Monarchy stable; SA linked.",histValue:0.14,endYear:1974,growthRate:0.048},
+	{name:"Lesotho  Loti",code:"LSL",issuer:"rLSL1515",pair:"LSL/XRP",group:"sadac",flag:"https://flagcdn.com/ls.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/L ocation_Lesotho.svg/250px-Location_Lesotho.svg.png",country:"Lesotho",iso:"LS",iso4217:"LSL",dates:"1979–present",lastUSD:"0.056",backing:"ZAR  Peg",history:"Enclave economy; remittances key.",histValue:0.14,endYear:1979,growthRate:0.048},
+	{name:"Madagascar  Ariary",code:"MGA",issuer:"rMGA1616",pair:"MGA/XRP",group:"sadac",flag:"https://flagcdn.com/mg.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ 2/2d/Location_Madagascar.svg/250px-Location_Madagascar.svg.png",country:"Madagascar",iso:"MG",iso4217:"MGA",dates:"1966– present",lastUSD:"0.00022",backing:"Vanilla Exports",history:"Political instability devalued.",histValue:0.0005,endYear:1966,growthRate:0.048},
+	{name:"Malawi  Kwacha",code:"MWK",issuer:"rMWK1717",pair:"MWK/XRP",group:"sadac",flag:"https://flagcdn.com/mw.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thu mb/d/d9/Location_Malawi.svg/250px-Location_Malawi.svg.png",country:"Malawi",iso:"MW",iso4217:"MWK",dates:"1964– present",lastUSD:"0.00058",backing:"Tobacco",history:"Devaluations from droughts.",histValue:0.0014,endYear:1964,growthRate:0.048},
+	{name:"Mauritius  Rupee",code:"MUR",issuer:"rMUR1818",pair:"MUR/XRP",group:"sadac",flag:"https://flagcdn.com/mu.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ 7/7c/Location_Mauritius.svg/250px-Location_Mauritius.svg.png",country:"Mauritius",iso:"MU",iso4217:"MUR",dates:"1877– present",lastUSD:"0.022",backing:"Tourism",history:"Stable island economy.",histValue:0.027,endYear:1877,growthRate:0.048},
+	{name:"Mozambique  Metical",code:"MZN",issuer:"rMZN1919",pair:"MZN/XRP",group:"sadac",flag:"https://flagcdn.com/mz.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ d/d1/Location_Mozambique.svg/250px-Location_Mozambique.svg.png",country:"Mozambique",iso:"MZ",iso4217:"MZN",dates:"2006– present",lastUSD:"0.015",backing:"Gas",history:"Post-civil war rebase.",histValue:0.016,endYear:2006,growthRate:0.048},
+	{name:"Namibian  Dollar",code:"NAD",issuer:"rNAD2020",pair:"NAD/XRP",group:"sadac",flag:"https://flagcdn.com/na.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9 /9c/Location_Namibia.svg/250px-Location_Namibia.svg.png",country:"Namibia",iso:"NA",iso4217:"NAD",dates:"1993–present",lastUSD:"0.056",backing:"ZAR  Peg",history:"Independence currency.",histValue:0.25,endYear:1993,growthRate:0.048},
+	{name:"Seychelles  Rupee",code:"SCR",issuer:"rSCR2121",pair:"SCR/XRP",group:"sadac",flag:"https://flagcdn.com/sc.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ 0/0b/Location_Seychelles.svg/250px-Location_Seychelles.svg.png",country:"Seychelles",iso:"SC",iso4217:"SCR",dates:"1914– present",lastUSD:"0.074",backing:"Tourism",history:"Island stability.",histValue:0.13,endYear:1914,growthRate:0.048},
+	{name:"South African  Rand",code:"ZAR",issuer:"rZAR2222",pair:"ZAR/XRP",group:"sadac",flag:"https://flagcdn.com/za.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/af /Location_South_Africa.svg/250px-Location_South_Africa.svg.png",country:"South Africa",iso:"ZA",iso4217:"ZAR",dates:"1961- present",lastUSD:"0.056",backing:"Mining",history:"Post-apartheid; 1995 rate ~6:1 USD.",histValue:0.167,endYear:1995,growthRate:0.048,hidden:true},
+	{name:"Tanzanian  Shilling",code:"TZS",issuer:"rTZS2323",pair:"TZS/XRP",group:"sadac",flag:"https://flagcdn.com/tz.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6 0/Location_Tanzania.svg/250px-Location_Tanzania.svg.png",country:"Tanzania",iso:"TZ",iso4217:"TZS",dates:"1966– present",lastUSD:"0.00038",backing:"Gold",history:"Union currency.",histValue:0.001,endYear:1966,growthRate:0.048},
+	{name:"Zambian  Kwacha",code:"ZMW",issuer:"rZMW2424",pair:"ZMW/XRP",group:"sadac",flag:"https://flagcdn.com/zm.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thu mb/8/8b/Location_Zambia.svg/250px-Location_Zambia.svg.png",country:"Zambia",iso:"ZM",iso4217:"ZMW",dates:"2013– present",lastUSD:"0.056",backing:"Copper",history:"Rebased 2012.",histValue:0.15,endYear:2012,growthRate:0.048},
+	{name:"Zimbabwe  ZiG",code:"ZWL",issuer:"rZWL2525",pair:"ZWL/XRP",group:"sadac",flag:"https://flagcdn.com/zw.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/ Location_Zimbabwe.svg/250px-Location_Zimbabwe.svg.png",country:"Zimbabwe",iso:"ZW",iso4217:"ZWL",dates:"2024– present",lastUSD:"0.027",backing:"Gold",history:"Post-hyper; new stable attempt.",histValue:0.027,endYear:2024,growthRate:0.048},
+	
+	// === WEST, CENTRAL & EAST AFRICAN BELT (5.8%) ===
+	{name:"Nigerian  Naira",code:"NGN",issuer:"rNGN301",pair:"NGN/XRP",group:"wcafrica",flag:"https://flagcdn.com/ng.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7 /79/Location_Nigeria.svg/250px-Location_Nigeria.svg.png",country:"Nigeria",iso:"NG",iso4217:"NGN",dates:"1973– present",lastUSD:"0.00061",backing:"Oil",history:"Africa’s giant.",histValue:0.71,endYear:1973,growthRate:0.058},
+	{name:"Ghanaian  Cedi",code:"GHS",issuer:"rGHS302",pair:"GHS/XRP",group:"wcafrica",flag:"https://flagcdn.com/gh.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/ 19/Location_Ghana.svg/250px-Location_Ghana.svg.png",country:"Ghana",iso:"GH",iso4217:"GHS",dates:"2007– present",lastUSD:"0.065",backing:"Gold",history:"Rebased.",histValue:0.065,endYear:2007,growthRate:0.058},
+	{name:"Ivorian  Franc",code:"XOF",issuer:"rXOF303",pair:"XOF/XRP",group:"wcafrica",flag:"https://flagcdn.com/ci.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f e/Location_Ivory_Coast.svg/250px-Location_Ivory_Coast.svg.png",country:"Côte d’Ivoire",iso:"CI",iso4217:"XOF",dates:"1945– present",lastUSD:"0.0017",backing:"CFA",history:"Cocoa leader.",histValue:0.0017,endYear:1945,growthRate:0.058,hidden:true},
+	{name:"Cameroonian  Franc",code:"XAF",issuer:"rXAF304",pair:"XAF/XRP",group:"wcafrica",flag:"https://flagcdn.com/cm.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/4 /4f/Location_Cameroon.svg/250px-Location_Cameroon.svg.png",country:"Cameroon",iso:"CM",iso4217:"XAF",dates:"1961– present",lastUSD:"0.0017",backing:"CFA",history:"Bilingual.",histValue:0.0017,endYear:1961,growthRate:0.058,hidden:true},
+	{name:"Congolese  Franc",code:"CDF",issuer:"rCDF305",pair:"CDF/XRP",group:"wcafrica",flag:"https://flagcdn.com/cg.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ 9/92/Location_Republic_of_the_Congo.svg/250px-Location_Republic_of_the_Congo.svg.png",country:"Congo-Brazzaville",iso:"CG",iso4217:"CDF",dates:"1997– present",lastUSD:"0.00036",backing:"Oil",history:"Smaller Congo.",histValue:0.00036,endYear:1997,growthRate:0.058},
+	{name:"Gabonese  Franc",code:"XAF",issuer:"rXAF306",pair:"XAF/XRP",group:"wcafrica",flag:"https://flagcdn.com/ga.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0 /0d/Location_Gabon.svg/250px-Location_Gabon.svg.png",country:"Gabon",iso:"GA",iso4217:"XAF",dates:"1961– present",lastUSD:"0.0017",backing:"Oil",history:"Rainforest.",histValue:0.0017,endYear:1961,growthRate:0.058},
+	{name:"Equatorial Guinean Franc",code:"XAF",issuer:"rX  &#1052;&#1072;&#1090;AF307",pair:"XAF/XRP",group:"wcafrica",flag:"https://flagcdn.com/gq.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/ Location_Equatorial_Guinea.svg/250px...png",country:"Equatorial Guinea",iso:"GQ",iso4217:"XAF",dates:"1985– present",lastUSD:"0.0017",backing:"Oil",history:"Spanish Africa.",histValue:0.0017,endYear:1985,growthRate:0.058,hidden:true},
+	{name:"Sao Tomean  Dobra",code:"STN",issuer:"rSTN308",pair:"STN/XRP",group:"wcafrica",flag:"https://flagcdn.com/st.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/ 4f/Location_Sao_Tome_and_Principe.svg/250px-Location_Sao_Tome_and_Principe.svg.png",country:"São Tomé and  Príncipe",iso:"ST",iso4217:"STN",dates:"2018–present",lastUSD:"0.043",backing:"Cocoa",history:"Island nation.",histValue:0.043,endYear:2018,growthRate:0.058,hidden:true},
+	{name:"Chadian  Franc",code:"XAF",issuer:"rXAF309",pair:"XAF/XRP",group:"wcafrica",flag:"https://flagcdn.com/td.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/ 4b/Location_Chad.svg/250px-Location_Chad.svg.png",country:"Chad",iso:"TD",iso4217:"XAF",dates:"1961– present",lastUSD:"0.0017",backing:"Oil",history:"Sahel.",histValue:0.0017,endYear:1961,growthRate:0.058},
+	{name:"Nigerien  Franc",code:"XOF",issuer:"rXOF310",pair:"XOF/XRP",group:"wcafrica",flag:"https://flagcdn.com/ne.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/ f4/Location_Niger.svg/250px-Location_Niger.svg.png",country:"Niger",iso:"NE",iso4217:"XOF",dates:"1945– present",lastUSD:"0.0017",backing:"Uranium",history:"Sahel.",histValue:0.0017,endYear:1945,growthRate:0.058,hidden:true},
+	{name:"Malian  Franc",code:"XOF",issuer:"rXOF311",pair:"XOF/XRP",group:"wcafrica",flag:"https://flagcdn.com/ml.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9 /92/Location_Mali.svg/250px-Location_Mali.svg.png",country:"Mali",iso:"ML",iso4217:"XOF",dates:"1962– present",lastUSD:"0.0017",backing:"Gold",history:"Timbuktu.",histValue:0.0017,endYear:1962,growthRate:0.058,hidden:true},
+	{name:"Burkinabe  Franc",code:"XOF",issuer:"rXOF312",pair:"XOF/XRP",group:"wcafrica",flag:"https://flagcdn.com/bf.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/ 31/Location_Burkina_Faso.svg/250px-Location_Burkina_Faso.svg.png",country:"Burkina Faso",iso:"BF",iso4217:"XOF",dates:"1960– present",lastUSD:"0.0017",backing:"Gold",history:"Land of upright men.",histValue:0.0017,endYear:1960,growthRate:0.058,hidden:true},
+	{name:"Senegalese  Franc",code:"XOF",issuer:"rXOF313",pair:"XOF/XRP",group:"wcafrica",flag:"https://flagcdn.com/sn.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/1 /1f/Location_Senegal.svg/250px-Location_Senegal.svg.png",country:"Senegal",iso:"SN",iso4217:"XOF",dates:"1960– present",lastUSD:"0.0017",backing:"Peanuts",history:"Dakar hub.",histValue:0.0017,endYear:1960,growthRate:0.058,hidden:true},
+	{name:"Guinean  Franc",code:"GNF",issuer:"rGNF314",pair:"GNF/XRP",group:"wcafrica",flag:"https://flagcdn.com/gn.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/e /ed/Location_Guinea.svg/250px-Location_Guinea.svg.png",country:"Guinea",iso:"GN",iso4217:"GNF",dates:"1985– present",lastUSD:"0.00011",backing:"Bauxite",history:"Rich but poor.",histValue:0.00011,endYear:1985,growthRate:0.058,hidden:true},
+	{name:"Sierra Leonean  Leone",code:"SLE",issuer:"rSLE315",pair:"SLE/XRP",group:"wcafrica",flag:"https://flagcdn.com/sl.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/ 17/Location_Sierra_Leone.svg/250px-Location_Sierra_Leone.svg.png",country:"Sierra Leone",iso:"SL",iso4217:"SLE",dates:"2022– present",lastUSD:"0.000045",backing:"Diamonds",history:"Post-war.",histValue:0.000045,endYear:2022,growthRate:0.058,hidden:true},
+	{name:"Liberian  Dollar",code:"LRD",issuer:"rLRD316",pair:"LRD/XRP",group:"wcafrica",flag:"https://flagcdn.com/lr.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b 8/Location_Liberia.svg/250px-Location_Liberia.svg.png",country:"Liberia",iso:"LR",iso4217:"LRD",dates:"1943– present",lastUSD:"0.0065",backing:"Rubber",history:"American colony.",histValue:0.0065,endYear:1943,growthRate:0.058},
+	{name:"Central African  Franc",code:"XAF",issuer:"rXAF317",pair:"XAF/XRP",group:"wcafrica",flag:"https://flagcdn.com/cf.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/ 6f/Location_Central_African_Republic.svg/250px-Location_Central_African_Republic.svg.png",country:"Central African  Republic",iso:"CF",iso4217:"XAF",dates:"1961–present",lastUSD:"0.0017",backing:"CFA",history:"Instability.",histValue:0.0017,endYear:1961,growthRate:0.058,hidden:true},
+	{name:"Sudanese  Pound",code:"SDG",issuer:"rSDG318",pair:"SDG/XRP",group:"wcafrica",flag:"https://flagcdn.com/sd.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb /0/01/Location_Sudan.svg/250px-Location_Sudan.svg.png",country:"Sudan",iso:"SD",iso4217:"SDG",dates:"2007– present",lastUSD:"0.0017",backing:"Oil",history:"Post-split.",histValue:0.0017,endYear:2007,growthRate:0.058,hidden:true},
+	{name:"South Sudanese  Pound",code:"SSP",issuer:"rSSP319",pair:"SSP/XRP",group:"wcafrica",flag:"https://flagcdn.com/ss.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ 7/75/Location_South_Sudan.svg/250px-Location_South_Sudan.svg.png",country:"South Sudan",iso:"SS",iso4217:"SSP",dates:"2011– present",lastUSD:"0.0077",backing:"Oil",history:"Newest nation.",histValue:0.0077,endYear:2011,growthRate:0.058,hidden:true},
+	{name:"Kenyan  Shilling",code:"KES",issuer:"rKES320",pair:"KES/XRP",group:"wcafrica",flag:"https://flagcdn.com/ke.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ 4/49/Location_Kenya.svg/250px-Location_Kenya.svg.png",country:"Kenya",iso:"KE",iso4217:"KES",dates:"1966– present",lastUSD:"0.0077",backing:"Tea",history:"East African hub.",histValue:0.0077,endYear:1966,growthRate:0.058},
+	{name:"Ugandan  Shilling",code:"UGX",issuer:"rUGX321",pair:"UGX/XRP",group:"wcafrica",flag:"https://flagcdn.com/ug.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb /4/4e/Location_Uganda.svg/250px-Location_Uganda.svg.png",country:"Uganda",iso:"UG",iso4217:"UGX",dates:"1987– present",lastUSD:"0.00027",backing:"Coffee",history:"Pearl of Africa.",histValue:0.00027,endYear:1987,growthRate:0.058,hidden:true},
+	{name:"Rwandan  Franc",code:"RWF",issuer:"rRWF322",pair:"RWF/XRP",group:"wcafrica",flag:"https://flagcdn.com/rw.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ 1/17/Location_Rwanda.svg/250px-Location_Rwanda.svg.png",country:"Rwanda",iso:"RW",iso4217:"RWF",dates:"1964– present",lastUSD:"0.00085",backing:"Tech",history:"Miracle recovery.",histValue:0.00085,endYear:1964,growthRate:0.058,hidden:true},
+	{name:"Burundian  Franc",code:"BIF",issuer:"rBIF323",pair:"BIF/XRP",group:"wcafrica",flag:"https://flagcdn.com/bi.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/ Location_Burundi.svg/250px-Location_Burundi.svg.png",country:"Burundi",iso:"BI",iso4217:"BIF",dates:"1964– present",lastUSD:"0.00035",backing:"Coffee",history:"Small but dense.",histValue:0.00035,endYear:1964,growthRate:0.058,hidden:true},
+	{name:"Ethiopian  Birr",code:"ETB",issuer:"rETB324",pair:"ETB/XRP",group:"wcafrica",flag:"https://flagcdn.com/et.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/ Location_Ethiopia.svg/250px-Location_Ethiopia.svg.png",country:"Ethiopia",iso:"ET",iso4217:"ETB",dates:"1976– present",lastUSD:"0.018",backing:"Coffee",history:"Never colonized.",histValue:0.018,endYear:1976,growthRate:0.058,hidden:true},
+	{name:"Somali  Shilling",code:"SOS",issuer:"rSOS325",pair:"SOS/XRP",group:"wcafrica",flag:"https://flagcdn.com/so.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb /a/a0/Location_Somalia.svg/250px-Location_Somalia.svg.png",country:"Somalia",iso:"SO",iso4217:"SOS",dates:"1962– present",lastUSD:"0.0017",backing:"Livestock",history:"Horn of Africa.",histValue:0.0017,endYear:1962,growthRate:0.058,hidden:true},
+	{name:"Djiboutian  Franc",code:"DJF",issuer:"rDJF326",pair:"DJF/XRP",group:"wcafrica",flag:"https://flagcdn.com/dj.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3 4/Location_Djibouti.svg/250px-Location_Djibouti.svg.png",country:"Djibouti",iso:"DJ",iso4217:"DJF",dates:"1977– present",lastUSD:"0.0056",backing:"Port",history:"Strategic.",histValue:0.0056,endYear:1977,growthRate:0.058,hidden:true},
+	
+	// === GREATER LEVANT & MAGHREB (6.2%) ===
+	{name:"Turkish  Lira",code:"TRY",issuer:"rTRY401",pair:"TRY/XRP",group:"levant",flag:"https://flagcdn.com/tr.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Loc ation_Turkey.svg/250px-Location_Turkey.svg.png",country:"Turkey",iso:"TR",iso4217:"TRY",dates:"2005–present",lastUSD:"0.03",backing:"Geopolitics",history:"Post- reform.",histValue:0.0015,endYear:2005,growthRate:0.062},
+	{name:"Syrian  Pound",code:"SYP",issuer:"rSYP402",pair:"SYP/XRP",group:"levant",flag:"https://flagcdn.com/sy.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53 /Location_Syria.svg/250px-Location_Syria.svg.png",country:"Syria",iso:"SY",iso4217:"SYP",dates:"1948–present",lastUSD:"0.00039",backing:"War",history:"Civil  conflict.",histValue:0.00039,endYear:1948,growthRate:0.062},
+	{name:"Lebanese  Pound",code:"LBP",issuer:"rLBP403",pair:"LBP/XRP",group:"levant",flag:"https://flagcdn.com/lb.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/59 /Location_Lebanon.svg/250px-Location_Lebanon.svg.png",country:"Lebanon",iso:"LB",iso4217:"LBP",dates:"1939– present",lastUSD:"0.000066",backing:"Crisis",history:"Banking collapse.",histValue:0.000066,endYear:1939,growthRate:0.062},
+	{name:"Israeli  Shekel",code:"ILS",issuer:"rILS404",pair:"ILS/XRP",group:"levant",flag:"https://flagcdn.com/il.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lo cation_Israel.svg/250px-Location_Israel.svg.png",country:"Israel",iso:"IL",iso4217:"ILS",dates:"1985–present",lastUSD:"0.27",backing:"Tech",history:"Start-up  nation.",histValue:0.27,endYear:1985,growthRate:0.062},
+	{name:"Jordanian  Dinar",code:"JOD",issuer:"rJOD405",pair:"JOD/XRP",group:"levant",flag:"https://flagcdn.com/jo.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/ Location_Jordan.svg/250px-Location_Jordan.svg.png",country:"Jordan",iso:"JO",iso4217:"JOD",dates:"1950– present",lastUSD:"1.41",backing:"Stability",history:"Hashemite.",histValue:1.41,endYear:1950,growthRate:0.062},
+	{name:"Iraqi  Dinar",code:"IQD",issuer:"rIQD406",pair:"IQD/XRP",group:"levant",flag:"https://flagcdn.com/iq.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Lo cation_Iraq.svg/250px-Location_Iraq.svg.png",country:"Iraq",iso:"IQ",iso4217:"IQD",dates:"1932–present",lastUSD:"0.00076",backing:"Oil",history:"RV  rumors.",histValue:0.00076,endYear:1932,growthRate:0.062},
+	{name:"Saudi  Riyal",code:"SAR",issuer:"rSAR407",pair:"SAR/XRP",group:"levant",flag:"https://flagcdn.com/sa.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d /Location_Saudi_Arabia.svg/250px-Location_Saudi_Arabia.svg.png",country:"Saudi Arabia",iso:"SA",iso4217:"SAR",dates:"1932– present",lastUSD:"0.27",backing:"Oil Peg",history:"Petrodollar.",histValue:0.27,endYear:1970,growthRate:0.062},
+	{name:"Kuwaiti  Dinar",code:"KWD",issuer:"rKWD408",pair:"KWD/XRP",group:"levant",flag:"https://flagcdn.com/kw.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ a4/Location_Kuwait.svg/250px-Location_Kuwait.svg.png",country:"Kuwait",iso:"KW",iso4217:"KWD",dates:"1961– present",lastUSD:"3.27",backing:"Oil",history:"World’s strongest.",histValue:3.27,endYear:1961,growthRate:0.062},
+	{name:"Bahraini  Dinar",code:"BHD",issuer:"rBHD409",pair:"BHD/XRP",group:"levant",flag:"https://flagcdn.com/bh.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2 8/Location_Bahrain.svg/250px-Location_Bahrain.svg.png",country:"Bahrain",iso:"BH",iso4217:"BHD",dates:"1965–present",lastUSD:"2.65",backing:"Oil",history:"Gulf  pearl.",histValue:2.65,endYear:1965,growthRate:0.062},
+	{name:"Qatari  Riyal",code:"QAR",issuer:"rQAR410",pair:"QAR/XRP",group:"levant",flag:"https://flagcdn.com/qa.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6 5/Location_Qatar.svg/250px-Location_Qatar.svg.png",country:"Qatar",iso:"QA",iso4217:"QAR",dates:"1973–present",lastUSD:"0.27",backing:"Gas",history:"World  Cup.",histValue:0.27,endYear:1973,growthRate:0.062},
+	{name:"Emirati  Dirham",code:"AED",issuer:"rAED411",pair:"AED/XRP",group:"levant",flag:"https://flagcdn.com/ae.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/ cb/Location_United_Arab_Emirates.svg/250px-Location_United_Arab_Emirates.svg.png",country:"UAE",iso:"AE",iso4217:"AED",dates:"1973– present",lastUSD:"0.27",backing:"Oil Peg",history:"Skyscrapers.",histValue:0.27,endYear:1973,growthRate:0.062},
+	{name:"Omani  Rial",code:"OMR",issuer:"rOMR412",pair:"OMR/XRP",group:"levant",flag:"https://flagcdn.com/om.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d d/Location_Oman.svg/250px-Location_Oman.svg.png",country:"Oman",iso:"OM",iso4217:"OMR",dates:"1970– present",lastUSD:"2.60",backing:"Oil",history:"Sultanate.",histValue:2.60,endYear:1970,growthRate:0.062},
+	{name:"Yemeni  Rial",code:"YER",issuer:"rYER413",pair:"YER/XRP",group:"levant",flag:"https://flagcdn.com/ye.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/L ocation_Yemen.svg/250px-Location_Yemen.svg.png",country:"Yemen",iso:"YE",iso4217:"YER",dates:"1990–present",lastUSD:"0.004",backing:"War",history:"Arabian  Felix.",histValue:0.004,endYear:1990,growthRate:0.062},
+	{name:"Egyptian  Pound",code:"EGP",issuer:"rEGP414",pair:"EGP/XRP",group:"levant",flag:"https://flagcdn.com/eg.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f e/Location_Egypt.svg/250px-Location_Egypt.svg.png",country:"Egypt",iso:"EG",iso4217:"EGP",dates:"1885– present",lastUSD:"0.032",backing:"Suez",history:"Pharaohs.",histValue:0.20,endYear:1952,growthRate:0.062},
+	{name:"Libyan  Dinar",code:"LYD",issuer:"rLYD415",pair:"LYD/XRP",group:"levant",flag:"https://flagcdn.com/ly.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/L ocation_Libya.svg/250px-Location_Libya.svg.png",country:"Libya",iso:"LY",iso4217:"LYD",dates:"1971–present",lastUSD:"0.21",backing:"Oil",history:"Post- Gaddafi.",histValue:0.21,endYear:1971,growthRate:0.062},
+	{name:"Tunisian  Dinar",code:"TND",issuer:"rTND416",pair:"TND/XRP",group:"levant",flag:"https://flagcdn.com/tn.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/ Location_Tunisia.svg/250px-Location_Tunisia.svg.png",country:"Tunisia",iso:"TN",iso4217:"TND",dates:"1958–present",lastUSD:"0.32",backing:"Tourism",history:"Arab  Spring.",histValue:0.32,endYear:1958,growthRate:0.062},
+	{name:"Algerian  Dinar",code:"DZD",issuer:"rDZD417",pair:"DZD/XRP",group:"levant",flag:"https://flagcdn.com/dz.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/77 /Location_Algeria.svg/250px-Location_Algeria.svg.png",country:"Algeria",iso:"DZ",iso4217:"DZD",dates:"1964– present",lastUSD:"0.0074",backing:"Gas",history:"Maghreb.",histValue:0.0074,endYear:1964,growthRate:0.062},
+	{name:"Moroccan  Dirham",code:"MAD",issuer:"rMAD418",pair:"MAD/XRP",group:"levant",flag:"https://flagcdn.com/ma.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ 2/2c/Location_Morocco.svg/250px-Location_Morocco.svg.png",country:"Morocco",iso:"MA",iso4217:"MAD",dates:"1960– present",lastUSD:"0.10",backing:"Phosphates",history:"Kingdom.",histValue:0.10,endYear:1960,growthRate:0.062},
+	
+	// === ATLANTIC EUROPE (4.1%) ===
+	{name:"Euro",code:"EUR",issuer:"rEUR501",pair:"EUR/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/eu.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/250px- Flag_of_Europe.svg.png",country:"Eurozone",iso:"EU",iso4217:"EUR",dates:"1999–present",lastUSD:"1.08",backing:"19 Nations",history:"Single  market.",histValue:1.17,endYear:1999,growthRate:0.041},
+	{name:"British Pound",code:"GBP",issuer:"rGBP502",pair:"GBP/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/gb.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Location_United_Kingdom.svg/250px- Location_United_Kingdom.svg.png",country:"Great Britain",iso:"GB",iso4217:"GBP",dates:"1707–present",lastUSD:"1.27",backing:"Sterling",history:"Global  reserve.",histValue:4.86,endYear:1914,growthRate:0.041},
+	{name:"German Mark",code:"DEM",issuer:"rDEM503",pair:"DEM/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/de.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Location_Germany.svg/250px- Location_Germany.svg.png",country:"Germany",iso:"DE",iso4217:"DEM",dates:"1948– 2002",lastUSD:"0.51",backing:"Euro",history:"Wirtschaftswunder.",histValue:0.51,endYear:1999,growthRate:0.041},
+	{name:"French Franc",code:"FRF",issuer:"rFRF504",pair:"FRF/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/fr.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Location_France.svg/250px- Location_France.svg.png",country:"France",iso:"FR",iso4217:"FRF",dates:"1360–2002",lastUSD:"0.15",backing:"Euro",history:"Ancien  régime.",histValue:0.15,endYear:1999,growthRate:0.041},
+	{name:"Italian Lira",code:"ITL",issuer:"rITL505",pair:"ITL/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/it.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Location_Italy.svg/250px- Location_Italy.svg.png",country:"Italy",iso:"IT",iso4217:"ITL",dates:"1861–2002",lastUSD:"0.00052",backing:"Euro",history:"Lira  legacy.",histValue:0.00052,endYear:1999,growthRate:0.041},
+	{name:"Spanish Peseta",code:"ESP",issuer:"rESP506",pair:"ESP/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/es.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Location_Spain.svg/250px- Location_Spain.svg.png",country:"Spain",iso:"ES",iso4217:"ESP",dates:"1868– 2002",lastUSD:"0.006",backing:"Euro",history:"Peseta.",histValue:0.006,endYear:1999,growthRate:0.041},
+	{name:"Portuguese Escudo",code:"PTE",issuer:"rPTE507",pair:"PTE/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/pt.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Location_Portugal.svg/250px- Location_Portugal.svg.png",country:"Portugal",iso:"PT",iso4217:"PTE",dates:"1911– 2002",lastUSD:"0.005",backing:"Euro",history:"Carnation.",histValue:0.005,endYear:1999,growthRate:0.041},
+	{name:"Dutch Guilder",code:"NLG",issuer:"rNLG508",pair:"NLG/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/nl.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Location_Netherlands.svg/250px- Location_Netherlands.svg.png",country:"Netherlands",iso:"NL",iso4217:"NLG",dates:"1817– 2002",lastUSD:"0.45",backing:"Euro",history:"Tulip.",histValue:0.45,endYear:1999,growthRate:0.041},
+	{name:"Belgian Franc",code:"BEF",issuer:"rBEF509",pair:"BEF/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/be.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Location_Belgium.svg/250px- Location_Belgium.svg.png",country:"Belgium",iso:"BE",iso4217:"BEF",dates:"1832– 2002",lastUSD:"0.025",backing:"Euro",history:"Bilingual.",histValue:0.04,endYear:1999,growthRate:0.041},
+	{name:"Luxembourgish Franc",code:"LUF",issuer:"rLUF510",pair:"LUF/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/lu.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Location_Luxembourg.svg/250px- Location_Luxembourg.svg.png",country:"Luxembourg",iso:"LU",iso4217:"LUF",dates:"1854–2002",lastUSD:"0.025",backing:"Euro",history:"Financial  hub.",histValue:0.025,endYear:1999,growthRate:0.041},
+	{name:"Austrian Schilling",code:"ATS",issuer:"rATS511",pair:"ATS/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/at.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Location_Austria.svg/250px- Location_Austria.svg.png",country:"Austria",iso:"AT",iso4217:"ATS",dates:"1924– 2002",lastUSD:"0.072",backing:"Euro",history:"Alpine.",histValue:0.013,endYear:1999,growthRate:0.041},
+	{name:"Irish Pound",code:"IEP",issuer:"rIEP512",pair:"IEP/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/ie.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Location_Ireland.svg/250px- Location_Ireland.svg.png",country:"Ireland",iso:"IE",iso4217:"IEP",dates:"1928–2002",lastUSD:"1.27",backing:"Euro",history:"Celtic  Tiger.",histValue:1.27,endYear:1999,growthRate:0.041},
+	{name:"Swiss Franc",code:"CHF",issuer:"rCHF513",pair:"CHF/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/ch.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Location_Switzerland.svg/250px- Location_Switzerland.svg.png",country:"Switzerland",iso:"CH",iso4217:"CHF",dates:"1850–present",lastUSD:"1.15",backing:"Safe Haven",history:"Neutral  gold.",histValue:0.24,endYear:1936,growthRate:0.041},
+	{name:"Maltese Lira",code:"MTL",issuer:"rMTL514",pair:"MTL/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/mt.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Location_Malta.svg/250px- Location_Malta.svg.png",country:"Malta",iso:"MT",iso4217:"MTL",dates:"1972– 2008",lastUSD:"2.33",backing:"Euro",history:"Knights.",histValue:2.33,endYear:2007,growthRate:0.041},
+	{name:"Cypriot Pound",code:"CYP",issuer:"rCYP515",pair:"CYP/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/cy.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Location_Cyprus.svg/250px- Location_Cyprus.svg.png",country:"Cyprus",iso:"CY",iso4217:"CYP",dates:"1960– 2008",lastUSD:"1.71",backing:"Euro",history:"Divided.",histValue:1.71,endYear:2007,growthRate:0.041},
+	{name:"Réunion Euro",code:"EUR",issuer:"rEUR516",pair:"EUR/XRP",group:"atlantic- eu",flag:"https://flagcdn.com/re.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Location_Réunion.svg/250px- Location_Réunion.svg.png",country:"Réunion",iso:"RE",iso4217:"EUR",dates:"2002–present",lastUSD:"1.08",backing:"EU",history:"Indian  Ocean.",histValue:1.17,endYear:2002,growthRate:0.041},
+	
+  	// === SCANDINAVIA (4.1%) ===
+	{name:"Danish  Krone",code:"DKK",issuer:"rDKK3131",pair:"DKK/XRP",group:"scandinavia",flag:"https://flagcdn.com/dk.svg",map:"https://upload.wikimedia.org/wikipedia/commons/th umb/9/9f/Location_Denmark.svg/250px-Location_Denmark.svg.png",country:"Denmark",iso:"DK",iso4217:"DKK",dates:"1875–present",lastUSD:"0.15",backing:"Euro  Peg",history:"Scandinavian Union survivor; stable welfare.",histValue:0.19,endYear:1955,growthRate:0.041,slogan:"Nordic Prosperity Model"},
+	{name:"Norwegian  Krone",code:"NOK",issuer:"rNOK3232",pair:"NOK/XRP",group:"scandinavia",flag:"https://flagcdn.com/no.svg",map:"https://upload.wikimedia.org/wikipedia/commons/th umb/d/dd/Location_Norway_Europe.svg/250px-Location_Norway_Europe.svg.png",country:"Norway",iso:"NO",iso4217:"NOK",dates:"1875– present",lastUSD:"0.095",backing:"Oil Fund",history:"Oil boom post-1970s.",histValue:0.14,endYear:1955,growthRate:0.041},
+	{name:"Swedish  Krona",code:"SEK",issuer:"rSEK3333",pair:"SEK/XRP",group:"scandinavia",flag:"https://flagcdn.com/se.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thu mb/4/4b/Location_Sweden_Europe.svg/250px-Location_Sweden_Europe.svg.png",country:"Sweden",iso:"SE",iso4217:"SEK",dates:"1873– present",lastUSD:"0.095",backing:"Float",history:"Neutrality aided growth.",histValue:0.19,endYear:1955,growthRate:0.041},
+	{name:"Finnish  Markka",code:"FIM",issuer:"rFIM3434",pair:"FIM/XRP",group:"scandinavia",flag:"https://flagcdn.com/fi.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thum b/b/bd/Location_Finland.svg/250px-Location_Finland.svg.png",country:"Finland",iso:"FI",iso4217:"FIM",dates:"1860–2002",lastUSD:"0.53",backing:"Euro  Prep",history:"Pre-euro; tech boom.",histValue:0.18,endYear:1955,growthRate:0.041},
+	{name:"Icelandic  Krona",code:"ISK",issuer:"rISK3535",pair:"ISK/XRP",group:"scandinavia",flag:"https://flagcdn.com/is.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ 3/3e/Location_Iceland_Europe.svg/250px-Location_Iceland_Europe.svg.png",country:"Iceland",iso:"IS",iso4217:"ISK",dates:"1874– present",lastUSD:"0.0073",backing:"Fisheries",history:"2008 crash; tourism recovery.",histValue:0.014,endYear:1874,growthRate:0.041},
+	{name:"Finnish Markka  (Early)",code:"FIM2",issuer:"rFIM238",pair:"FIM2/XRP",group:"scandinavia",flag:"https://flagcdn.com/fi.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thum b/b/bd/Location_Finland.svg/250px-Location_Finland.svg.png",country:"Finland",iso:"FI",iso4217:"FIM",dates:"1860–1917",lastUSD:"0.20",backing:"Russian Ruble  Peg",history:"Autonomy era.",histValue:0.20,endYear:1860,growthRate:0.041,hidden:true},
+
+	// === EURASIAN STEPPE BELT (7.0%) ===
+	{name:"Russian  Ruble",code:"RUB",issuer:"rRUB601",pair:"RUB/XRP",group:"steppe",flag:"https://flagcdn.com/ru.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3 /Location_Russia.svg/250px-Location_Russia.svg.png",country:"Russia",iso:"RU",iso4217:"RUB",dates:"1998–present",lastUSD:"0.011",backing:"Oil &  Gas",history:"Post-Soviet.",histValue:0.16,endYear:1998,growthRate:0.070},
+	{name:"Belarusian  Ruble",code:"BYN",issuer:"rBYN602",pair:"BYN/XRP",group:"steppe",flag:"https://flagcdn.com/by.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8 5/Location_Belarus.svg/250px-Location_Belarus.svg.png",country:"Belarus",iso:"BY",iso4217:"BYN",dates:"2016–present",lastUSD:"0.30",backing:"Russia  Ally",history:"Rebased.",histValue:0.30,endYear:2016,growthRate:0.070},
+	{name:"Ukrainian  Hryvnia",code:"UAH",issuer:"rUAH603",pair:"UAH/XRP",group:"steppe",flag:"https://flagcdn.com/ua.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/4 /49/Location_Ukraine.svg/250px-Location_Ukraine.svg.png",country:"Ukraine",iso:"UA",iso4217:"UAH",dates:"1996– present",lastUSD:"0.024",backing:"Grain",history:"Independence.",histValue:0.024,endYear:1996,growthRate:0.070,hidden:true},
+	{name:"Kazakhstani  Tenge",code:"KZT",issuer:"rKZT604",pair:"KZT/XRP",group:"steppe",flag:"https://flagcdn.com/kz.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3 /Location_Kazakhstan.svg/250px-Location_Kazakhstan.svg.png",country:"Kazakhstan",iso:"KZ",iso4217:"KZT",dates:"1993– present",lastUSD:"0.0021",backing:"Oil",history:"Steppe giant.",histValue:0.0021,endYear:1993,growthRate:0.070},
+	{name:"Uzbekistani  Som",code:"UZS",issuer:"rUZS605",pair:"UZS/XRP",group:"steppe",flag:"https://flagcdn.com/uz.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/ Location_Uzbekistan.svg/250px-Location_Uzbekistan.svg.png",country:"Uzbekistan",iso:"UZ",iso4217:"UZS",dates:"1994– present",lastUSD:"0.000081",backing:"Cotton",history:"Silk Road.",histValue:0.000081,endYear:1994,growthRate:0.070,hidden:true},
+	{name:"Turkmenistani  Manat",code:"TMT",issuer:"rTMT606",pair:"TMT/XRP",group:"steppe",flag:"https://flagcdn.com/tm.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1 b/Location_Turkmenistan.svg/250px-Location_Turkmenistan.svg.png",country:"Turkmenistan",iso:"TM",iso4217:"TMT",dates:"2009– present",lastUSD:"0.29",backing:"Gas",history:"Isolated.",histValue:0.29,endYear:2009,growthRate:0.070,hidden:true},
+	{name:"Kyrgyzstani  Som",code:"KGS",issuer:"rKGS607",pair:"KGS/XRP",group:"steppe",flag:"https://flagcdn.com/kg.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c 7/Location_Kyrgyzstan.svg/250px-Location_Kyrgyzstan.svg.png",country:"Kyrgyzstan",iso:"KG",iso4217:"KGS",dates:"1993– present",lastUSD:"0.012",backing:"Gold",history:"Mountain.",histValue:0.012,endYear:1993,growthRate:0.070,hidden:true},
+	{name:"Tajikistani  Somoni",code:"TJS",issuer:"rTJS608",pair:"TJS/XRP",group:"steppe",flag:"https://flagcdn.com/tj.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0 /Location_Tajikistan.svg/250px-Location_Tajikistan.svg.png",country:"Tajikistan",iso:"TJ",iso4217:"TJS",dates:"2000– present",lastUSD:"0.091",backing:"Remittances",history:"Pamir.",histValue:0.091,endYear:2000,growthRate:0.070,hidden:true},
+	{name:"Mongolian  Tögrög",code:"MNT",issuer:"rMNT609",pair:"MNT/XRP",group:"steppe",flag:"https://flagcdn.com/mn.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ 4/49/Location_Mongolia.svg/250px-Location_Mongolia.svg.png",country:"Mongolia",iso:"MN",iso4217:"MNT",dates:"1925– present",lastUSD:"0.00029",backing:"Mining",history:"Genghis.",histValue:0.00029,endYear:1925,growthRate:0.070},
+	{name:"Pakistani  Rupee",code:"PKR",issuer:"rPKR610",pair:"PKR/XRP",group:"steppe",flag:"https://flagcdn.com/pk.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/ 32/Location_Pakistan.svg/250px-Location_Pakistan_svg.png",country:"Pakistan",iso:"PK",iso4217:"PKR",dates:"1948– present",lastUSD:"0.0036",backing:"Textiles",history:"Indus.",histValue:0.0036,endYear:1948,growthRate:0.070},
+	{name:"Afghan  Afghani",code:"AFN",issuer:"rAFN611",pair:"AFN/XRP",group:"steppe",flag:"https://flagcdn.com/af.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/ 9a/Location_Afghanistan.svg/250px-Location_Afghanistan.svg.png",country:"Afghanistan",iso:"AF",iso4217:"AFN",dates:"2002– present",lastUSD:"0.011",backing:"Aid",history:"Crossroads.",histValue:0.011,endYear:2002,growthRate:0.070},
+	
+	// === INDIAN SUBCONTINENTAL REALM (6.5%) ===
+	{name:"Indian  Rupee",code:"INR",issuer:"rINR801",pair:"INR/XRP",group:"india",flag:"https://flagcdn.com/in.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Lo cation_India.svg/250px-Location_India.svg.png",country:"India",iso:"IN",iso4217:"INR",dates:"1947–present",lastUSD:"0.012",backing:"IT & Services",history:"World’s  largest democracy.",histValue:0.21,endYear:1947,growthRate:0.065},
+	{name:"Nepalese  Rupee",code:"NPR",issuer:"rNPR802",pair:"NPR/XRP",group:"india",flag:"https://flagcdn.com/np.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9 b/Location_Nepal.svg/250px-Location_Nepal.svg.png",country:"Nepal",iso:"NP",iso4217:"NPR",dates:"1932– present",lastUSD:"0.0075",backing:"Remittances",history:"Himalaya.",histValue:0.0075,endYear:1932,growthRate:0.065},
+	{name:"Bhutanese  Ngultrum",code:"BTN",issuer:"rBTN803",pair:"BTN/XRP",group:"india",flag:"https://flagcdn.com/bt.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9 1/Location_Bhutan.svg/250px-Location_Bhutan.svg.png",country:"Bhutan",iso:"BT",iso4217:"BTN",dates:"1974–present",lastUSD:"0.012",backing:"INR  Peg",history:"Happiness index.",histValue:0.012,endYear:1974,growthRate:0.065,hidden:true},
+	{name:"Bangladeshi  Taka",code:"BDT",issuer:"rBDT804",pair:"BDT/XRP",group:"india",flag:"https://flagcdn.com/bd.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Lo cation_Bangladesh.svg/250px-Location_Bangladesh.svg.png",country:"Bangladesh",iso:"BD",iso4217:"BDT",dates:"1972– present",lastUSD:"0.0093",backing:"Garments",history:"Delta nation.",histValue:0.0093,endYear:1972,growthRate:0.065,hidden:true},
+	{name:"Myanmar  Kyat",code:"MMK",issuer:"rMMK805",pair:"MMK/XRP",group:"india",flag:"https://flagcdn.com/mm.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8 c/Location_Myanmar.svg/250px-Location_Myanmar.svg.png",country:"Myanmar",iso:"MM",iso4217:"MMK",dates:"1989– present",lastUSD:"0.00047",backing:"Jade",history:"Post-junta.",histValue:0.00047,endYear:1989,growthRate:0.065,hidden:true},
+	{name:"Sri Lankan  Rupee",code:"LKR",issuer:"rLKR806",pair:"LKR/XRP",group:"india",flag:"https://flagcdn.com/lk.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/ Location_Sri_Lanka.svg/250px-Location_Sri_Lanka.svg.png",country:"Sri Lanka",iso:"LK",iso4217:"LKR",dates:"1872– present",lastUSD:"0.0033",backing:"Tea",history:"Ceylon.",histValue:0.0033,endYear:1872,growthRate:0.065},
+
+  	// === ORIENT (9.0%) ===
+	{name:"Chinese Yuan",code:"CNY",issuer:"rCNY701",pair:"CNY/XRP",group:"east- asia",flag:"https://flagcdn.com/cn.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Location_China.svg/250px- Location_China.svg.png",country:"China",iso:"CN",iso4217:"CNY",dates:"1948–present",lastUSD:"0.14",backing:"Managed",history:"World  factory.",histValue:0.43,endYear:1978,growthRate:0.090},
+	{name:"Taiwan Dollar",code:"TWD",issuer:"rTWD702",pair:"TWD/XRP",group:"east- asia",flag:"https://flagcdn.com/tw.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Location_Taiwan.svg/250px- Location_Taiwan.svg.png",country:"Taiwan",iso:"TW",iso4217:"TWD",dates:"1949–present",lastUSD:"0.031",backing:"Tech",history:"Chip  island.",histValue:0.031,endYear:1949,growthRate:0.090},
+	{name:"North Korean Won",code:"KPW",issuer:"rKPW703",pair:"KPW/XRP",group:"east- asia",flag:"https://flagcdn.com/kp.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Location_North_Korea.svg/250px- Location_North_Korea.svg.png",country:"North Korea",iso:"KP",iso4217:"KPW",dates:"1947– present",lastUSD:"0.0011",backing:"State",history:"Isolated.",histValue:0.0011,endYear:1947,growthRate:0.090},
+	{name:"South Korean Won",code:"KRW",issuer:"rKRW704",pair:"KRW/XRP",group:"east- asia",flag:"https://flagcdn.com/kr.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Location_South_Korea.svg/250px- Location_South_Korea.svg.png",country:"South Korea",iso:"KR",iso4217:"KRW",dates:"1953–present",lastUSD:"0.00075",backing:"Tech",history:"Miracle on  Han.",histValue:0.00075,endYear:1953,growthRate:0.090},
+	{name:"Japanese Yen",code:"JPY",issuer:"rJPY705",pair:"JPY/XRP",group:"east- asia",flag:"https://flagcdn.com/jp.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Location_Japan.svg/250px- Location_Japan.svg.png",country:"Japan",iso:"JP",iso4217:"JPY",dates:"1871–present",lastUSD:"0.0067",backing:"Tech",history:"Lost  decades.",histValue:0.0028,endYear:1971,growthRate:0.090},
+	{name:"Vietnamese Dong",code:"VND",issuer:"rVND706",pair:"VND/XRP",group:"east- asia",flag:"https://flagcdn.com/vn.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Location_Vietnam_Asia.png/250px- Location_Vietnam_Asia.png",country:"Vietnam",iso:"VN",iso4217:"VND",dates:"1978–present",lastUSD:"0.00004",backing:"Export",history:"RV  rumors.",histValue:0.00014,endYear:1978,growthRate:0.090},
+	{name:"Laotian Kip",code:"LAK",issuer:"rLAK707",pair:"LAK/XRP",group:"east- asia",flag:"https://flagcdn.com/la.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Location_Laos.svg/250px- Location_Laos.svg.png",country:"Laos",iso:"LA",iso4217:"LAK",dates:"1955– present",lastUSD:"0.000047",backing:"Hydropower",history:"Landlocked.",histValue:0.000047,endYear:1955,growthRate:0.090},
+	{name:"Cambodian Riel",code:"KHR",issuer:"rKHR708",pair:"KHR/XRP",group:"east- asia",flag:"https://flagcdn.com/kh.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Location_Cambodia.svg/250px- Location_Cambodia.svg.png",country:"Cambodia",iso:"KH",iso4217:"KHR",dates:"1980– present",lastUSD:"0.00024",backing:"Tourism",history:"Angkor.",histValue:0.00024,endYear:1980,growthRate:0.090},
+	{name:"Thai Baht",code:"THB",issuer:"rTHB709",pair:"THB/XRP",group:"east- asia",flag:"https://flagcdn.com/th.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Location_Thailand.svg/250px- Location_Thailand.svg.png",country:"Thailand",iso:"TH",iso4217:"THB",dates:"1997–present",lastUSD:"0.028",backing:"Tourism",history:"Land of  smiles.",histValue:0.03,endYear:1997,growthRate:0.090},
+	{name:"Malaysian Ringgit",code:"MYR",issuer:"rMYR710",pair:"MYR/XRP",group:"east- asia",flag:"https://flagcdn.com/my.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Location_Malaysia.svg/250px- Location_Malaysia.svg.png",country:"Malaysia",iso:"MY",iso4217:"MYR",dates:"1998–present",lastUSD:"0.23",backing:"Palm Oil",history:"Twin  towers.",histValue:0.26,endYear:1998,growthRate:0.090},
+	{name:"Singapore Dollar",code:"SGD",issuer:"rSGD711",pair:"SGD/XRP",group:"east- asia",flag:"https://flagcdn.com/sg.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Location_Singapore.svg/250px- Location_Singapore.svg.png",country:"Singapore",iso:"SG",iso4217:"SGD",dates:"1967–present",lastUSD:"0.74",backing:"Finance",history:"Asian  Tiger.",histValue:0.83,endYear:1967,growthRate:0.090},
+	{name:"Hong Kong Dollar",code:"HKD",issuer:"rHKD712",pair:"HKD/XRP",group:"east- asia",flag:"https://flagcdn.com/hk.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Location_Hong_Kong.svg/250px- Location_Hong_Kong.svg.png",country:"Hong Kong",iso:"HK",iso4217:"HKD",dates:"1937–present",lastUSD:"0.13",backing:"USD Peg",history:"Global  finance.",histValue:0.13,endYear:1937,growthRate:0.090},
+	{name:"Philippine Peso",code:"PHP",issuer:"rPHP713",pair:"PHP/XRP",group:"east- asia",flag:"https://flagcdn.com/ph.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Location_Philippines.svg/250px- Location_Philippines.svg.png",country:"Philippines",iso:"PH",iso4217:"PHP",dates:"1949– present",lastUSD:"0.018",backing:"Remittances",history:"Archipelago.",histValue:0.50,endYear:1949,growthRate:0.090},
+	{name:"Indonesian Rupiah (Sumatra)",code:"IDR",issuer:"rIDR714",pair:"IDR/XRP",group:"east- asia",flag:"https://flagcdn.com/id.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Location_Indonesia.svg/250px- Location_Indonesia.svg.png",country:"Indonesia (Sumatra)",iso:"ID-SU",iso4217:"IDR",dates:"1965–present",lastUSD:"0.000066",backing:"Palm Oil",history:"Major  islands.",histValue:0.000066,endYear:1965,growthRate:0.090},
+	{name:"Indonesian Rupiah (Java)",code:"IDR",issuer:"rIDR715",pair:"IDR/XRP",group:"east- asia",flag:"https://flagcdn.com/id.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Location_Indonesia.svg/250px- Location_Indonesia.svg.png",country:"Indonesia (Java)",iso:"ID-JA",iso4217:"IDR",dates:"1965–present",lastUSD:"0.000066",backing:"Population",history:"Major  islands.",histValue:0.000066,endYear:1965,growthRate:0.090},
+	{name:"Indonesian Rupiah (Borneo)",code:"IDR",issuer:"rIDR716",pair:"IDR/XRP",group:"east- asia",flag:"https://flagcdn.com/id.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Location_Indonesia.svg/250px- Location_Indonesia.svg.png",country:"Indonesia (Borneo)",iso:"ID-KA",iso4217:"IDR",dates:"1965–present",lastUSD:"0.000066",backing:"Timber",history:"Major  islands.",histValue:0.000066,endYear:1965,growthRate:0.090},
+	{name:"Indonesian Rupiah (Sulawesi)",code:"IDR",issuer:"rIDR717",pair:"IDR/XRP",group:"east- asia",flag:"https://flagcdn.com/id.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Location_Indonesia.svg/250px- Location_Indonesia.svg.png",country:"Indonesia (Sulawesi)",iso:"ID-SL",iso4217:"IDR",dates:"1965–present",lastUSD:"0.000066",backing:"Nickel",history:"Major  islands.",histValue:0.000066,endYear:1965,growthRate:0.090},
+	{name:"Indonesian Rupiah (Bali)",code:"IDR",issuer:"rIDR718",pair:"IDR/XRP",group:"east- asia",flag:"https://flagcdn.com/id.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Location_Indonesia.svg/250px- Location_Indonesia.svg.png",country:"Indonesia (Bali)",iso:"ID-BA",iso4217:"IDR",dates:"1965–present",lastUSD:"0.000066",backing:"Tourism",history:"Major  islands.",histValue:0.000066,endYear:1965,growthRate:0.090},
+  
+  	// === AUSTRALIA (5.5%) ===
+	{name:"Australian  Dollar",code:"AUD",issuer:"rAUD901",pair:"AUD/XRP",group:"australia",flag:"https://flagcdn.com/au.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ b/b9/Location_Australia.svg/250px-Location_Australia.svg.png",country:"Australia",iso:"AU",iso4217:"AUD",dates:"1966– present",lastUSD:"0.67",backing:"Mining",history:"Down under.",histValue:0.67,endYear:1966,growthRate:0.052},
+	{name:"New Zealand  Dollar",code:"NZD",issuer:"rNZD902",pair:"NZD/XRP",group:"australia",flag:"https://flagcdn.com/nz.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/ 3e/Location_New_Zealand.svg/250px-Location_New_Zealand.svg.png",country:"New Zealand",iso:"NZ",iso4217:"NZD",dates:"1967– present",lastUSD:"0.62",backing:"Dairy",history:"Kiwi.",histValue:0.62,endYear:1967,growthRate:0.052},
+	{name:"Papua New Guinean  Kina",code:"PGK",issuer:"rPGK903",pair:"PGK/XRP",group:"australia",flag:"https://flagcdn.com/pg.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/ 3e/Location_Papua_New_Guinea.svg/250px-Location_Papua_New_Guinea.svg.png",country:"Papua New Guinea",iso:"PG",iso4217:"PGK",dates:"1975– present",lastUSD:"0.28",backing:"Gold & LNG",history:"Tribes.",histValue:0.28,endYear:1975,growthRate:0.052},
+	{name:"Fijian  Dollar",code:"FJD",issuer:"rFJD904",pair:"FJD/XRP",group:"australia",flag:"https://flagcdn.com/fj.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b a/Location_Fiji.svg/250px-Location_Fiji.svg.png",country:"Fiji",iso:"FJ",iso4217:"FJD",dates:"1969–present",lastUSD:"0.45",backing:"Tourism",history:"Soft coral  capital.",histValue:0.45,endYear:1969,growthRate:0.052},
+	{name:"Solomon Islands  Dollar",code:"SBD",issuer:"rSBD905",pair:"SBD/XRP",group:"australia",flag:"https://flagcdn.com/sb.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/ 7/74/Location_Solomon_Islands.svg/250px-Location_Solomon_Islands.svg.png",country:"Solomon Islands",iso:"SB",iso4217:"SBD",dates:"1977– present",lastUSD:"0.12",backing:"Fish",history:"WWII.",histValue:0.12,endYear:1977,growthRate:0.052},
+	{name:"Vanuatu  Vatu",code:"VUV",issuer:"rVUV906",pair:"VUV/XRP",group:"australia",flag:"https://flagcdn.com/vu.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/ bc/Location_Vanuatu.svg/250px-Location_Vanuatu.svg.png",country:"Vanuatu",iso:"VU",iso4217:"VUV",dates:"1981– present",lastUSD:"0.0085",backing:"Tourism",history:"Tax haven.",histValue:0.0085,endYear:1981,growthRate:0.052},
+	{name:"New Caledonian  Franc",code:"XPF",issuer:"rXPF907",pair:"XPF/XRP",group:"australia",flag:"https://flagcdn.com/nc.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/ 9d/Location_New_Caledonia.svg/250px-Location_New_Caledonia.svg.png",country:"New Caledonia",iso:"NC",iso4217:"XPF",dates:"1945– present",lastUSD:"0.0091",backing:"Nickel",history:"French Pacific.",histValue:0.0091,endYear:1945,growthRate:0.052},
+	{name:"Samoan  Tala",code:"WST",issuer:"rWST908",pair:"WST/XRP",group:"australia",flag:"https://flagcdn.com/ws.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/ 3e/Location_Samoa.svg/250px-Location_Samoa.svg.png",country:"Samoa",iso:"WS",iso4217:"WST",dates:"1967– present",lastUSD:"0.36",backing:"Remittances",history:"Polynesia.",histValue:0.36,endYear:1967,growthRate:0.052},
+	{name:"Tongan  Pa&#699;anga",code:"TOP",issuer:"rTOP909",pair:"TOP/XRP",group:"australia",flag:"https://flagcdn.com/to.svg",map:"https://upload.wikimedia.org/wikipedia/commons /thumb/9/9a/Location_Tonga.svg/250px-Location_Tonga.svg.png",country:"Tonga",iso:"TO",iso4217:"TOP",dates:"1967– present",lastUSD:"0.42",backing:"Tourism",history:"Kingdom.",histValue:0.42,endYear:1967,growthRate:0.052},
+	{name:"French Polynesian  Franc",code:"XPF",issuer:"rXPF910",pair:"XPF/XRP",group:"australia",flag:"https://flagcdn.com/pf.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/ db/Location_French_Polynesia.svg/250px-Location_French_Polynesia.svg.png",country:"French Polynesia",iso:"PF",iso4217:"XPF",dates:"1945– present",lastUSD:"0.0091",backing:"Tourism",history:"Tahiti.",histValue:0.0091,endYear:1945,growthRate:0.052},
+	{name:"Indonesian Rupiah  (Timor)",code:"IDR",issuer:"rIDR911",pair:"IDR/XRP",group:"australia",flag:"https://flagcdn.com/id.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f /Location_Indonesia.svg/250px-Location_Indonesia.svg.png",country:"Indonesia (Timor)",iso:"ID-TT",iso4217:"IDR",dates:"1965– present",lastUSD:"0.000066",backing:"Coffee",history:"Eastern islands.",histValue:0.000066,endYear:1965,growthRate:0.052},
+	{name:"Indonesian Rupiah  (Maluku)",code:"IDR",issuer:"rIDR912",pair:"IDR/XRP",group:"australia",flag:"https://flagcdn.com/id.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/ 9f/Location_Indonesia.svg/250px-Location_Indonesia.svg.png",country:"Indonesia (Maluku)",iso:"ID-ML",iso4217:"IDR",dates:"1965– present",lastUSD:"0.000066",backing:"Spice",history:"Eastern islands.",histValue:0.000066,endYear:1965,growthRate:0.052},
+	{name:"Indonesian Rupiah (Lesser  Sundas)",code:"IDR",issuer:"rIDR913",pair:"IDR/XRP",group:"australia",flag:"https://flagcdn.com/id.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/ 9f/Location_Indonesia.svg/250px-Location_Indonesia.svg.png",country:"Indonesia (Lesser Sundas)",iso:"ID-NU",iso4217:"IDR",dates:"1965– present",lastUSD:"0.000066",backing:"Tourism",history:"Eastern islands.",histValue:0.000066,endYear:1965,growthRate:0.052},
+	
+	// === TRADE ===
+	{name:"BRICS Unity Note",code:"BUN",issuer:"rBUN001",pair:"BUN/XRP",group:"trade",flag:"https://flagcdn.com/br.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/BRICS_map.svg/250px-BRICS_map.svg.png",country:"BRICS",iso:"BR",iso4217:"BUN",dates:"2025–future",lastUSD:"1.00",backing:"GDP Basket",history:"Emerging powers unite. Trade in BUN, not USD?",histValue:1.00,endYear:2025,growthRate:0.06,slogan:"Lets trade with each other and become very wealthy - What have you got to barter"},
+	{name:"AfCFTA Africa Single",code:"AFS",issuer:"rAFS002",pair:"AFS/XRP",group:"trade",flag:"https://flagcdn.com/za.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Africa_orthographic.svg/250px-Africa_orthographic.svg.png",country:"Africa",iso:"AF",iso4217:"AFS",dates:"2025–future",lastUSD:"0.80",backing:"Pan-African Trade",history:"54 nations, one currency. The rise of AFS.",histValue:0.80,endYear:2025,growthRate:0.06},
+	{name:"RCEP Pacific Pact",code:"RPP",issuer:"rRPP003",pair:"RPP/XRP",group:"trade",flag:"https://flagcdn.com/cn.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/RCEP_members.svg/250px-RCEP_members.svg.png",country:"Asia-Pacific",iso:"RP",iso4217:"RPP",dates:"2025–future",lastUSD:"1.10",backing:"Trade Volume",history:"Largest trade bloc. RPP vs USD?",histValue:1.10,endYear:2025,growthRate:0.06},
+	{name:"GCC Gulf Dinar",code:"GCD",issuer:"rGCD004",pair:"GCD/XRP",group:"trade",flag:"https://flagcdn.com/sa.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/GCC_map.svg/250px-GCC_map.svg.png",country:"Gulf States",iso:"GC",iso4217:"GCD",dates:"2025–future",lastUSD:"3.00",backing:"Oil & Gold",history:"Petrodollar killer? GCD rises.",histValue:3.00,endYear:2025,growthRate:0.06},
+	{name:"USMCA North Accord",code:"UNA",issuer:"rUNA005",pair:"UNA/XRP",group:"trade",flag:"https://flagcdn.com/us.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/North_America.svg/250px-North_America.svg.png",country:"North America",iso:"UN",iso4217:"UNA",dates:"2025–future",lastUSD:"1.05",backing:"Industrial Output",history:"NAFTA reborn. UNA vs USD?",histValue:1.05,endYear:2025,growthRate:0.06},
+
+	// === COMMODITIES ===
+	{name:"Gold Reserve",code:"XAU",issuer:"rXAU001",pair:"XAU/XRP",group:"commodities",flag:"gold1.jpeg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/World_map_with_gold_deposits.svg/250px-World_map_with_gold_deposits.svg.png",country:"Global",iso:"XX",iso4217:"XAU",dates:"Ancient–present",lastUSD:"2650",backing:"Physical Gold",history:"The eternal store of value. What if nations traded in XAU, not USD?",histValue:1800,endYear:2000,growthRate:0.052,slogan:"Two pounds of wheat for a day's wages, and six pounds of barley for a day's wages, and do not damage the oil and the wine!"},
+	{name:"Silver Reserve",code:"XAG",issuer:"rXAG002",pair:"XAG/XRP",group:"commodities",flag:"silver2.jpeg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Silver_mining_world_map.svg/250px-Silver_mining_world_map.svg.png",country:"Global",iso:"XX",iso4217:"XAG",dates:"Ancient–present",lastUSD:"32",backing:"Physical Silver",history:"The people's precious metal. Industrial + monetary demand rising.",histValue:20,endYear:2000,growthRate:0.052},
+	{name:"Platinum Reserve",code:"XPT",issuer:"rXPT003",pair:"XPT/XRP",group:"commodities",flag:"platinum2.jpeg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Platinum_mining_in_South_Africa.svg/250px-Platinum_mining_in_South_Africa.svg.png",country:"Global",iso:"XX",iso4217:"XPT",dates:"1900–present",lastUSD:"1050",backing:"Physical Platinum",history:"Rare, catalytic, green tech fuel. Supply squeezed.",histValue:800,endYear:2000,growthRate:0.052},
+	{name:"Copper Reserve",code:"XCU",issuer:"rXCU004",pair:"XCU/XRP",group:"commodities",flag:"copper1.jpeg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Copper_mining_world.svg/250px-Copper_mining_world.svg.png",country:"Global",iso:"XX",iso4217:"XCU",dates:"2025–future",lastUSD:"9500",backing:"Per Metric Ton",history:"Wires the world. EV boom = copper supercycle?",histValue:6000,endYear:2020,growthRate:0.052},
+	{name:"Crude Oil Reserve",code:"XBR",issuer:"rXBR005",pair:"XBR/XRP",group:"commodities",flag:"crude1.jpeg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Oil_reserves_world_map.svg/250px-Oil_reserves_world_map.svg.png",country:"Global",iso:"XX",iso4217:"XBR",dates:"1973–present",lastUSD:"82",backing:"Brent Barrel",history:"Energy blood. What if oil traded in XBR, not petrodollars?",histValue:100,endYear:2020,growthRate:0.052},
+	
+  	// === SDR (4.1%) ===
+	{name:"Special Drawing  Rights",code:"SDR",issuer:"rSDR2626",pair:"SDR/XRP",group:"sdr",flag:"https://flagcdn.com/un.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/65 /Circle-icons-globe.svg/250px-Circle-icons-globe.svg.png",country:"IMF",iso:"UN",iso4217:"XDR",dates:"1969–present",lastUSD:"1.33",backing:"Basket  (USD,EUR,CNY,JPY,GBP)",history:"Global reserve asset; stable by design.",histValue:1.00,endYear:1969,growthRate:0.041,slogan:"Global Watchdog - Big Daddy is watching your Economy"},
+	{name:"US Dollar (SDR  Component)",code:"USD",issuer:"rUSD2727",pair:"USD/XRP",group:"sdr",flag:"https://flagcdn.com/us.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thum b/a/a4/Location_map_United_States.png/250px-Location_map_United_States.png",country:"USA",iso:"US",iso4217:"USD",dates:"1792– present",lastUSD:"1.00",backing:"Fiat",history:"Dominant SDR weight; inflation hedge.",histValue:1.00,endYear:1969,growthRate:0.041},
+	{name:"Euro (SDR  Component)",code:"EUR",issuer:"rEUR2828",pair:"EUR/XRP",group:"sdr",flag:"https://flagcdn.com/eu.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thum b/b/b7/Flag_of_Europe.svg/250px-Flag_of_Europe.svg.png",country:"Eurozone",iso:"EU",iso4217:"EUR",dates:"1999– present",lastUSD:"1.08",backing:"Basket",history:"SDR anchor; post-franc/mark.",histValue:0.85,endYear:1999,growthRate:0.041},
+	{name:"Chinese Yuan  (SDR)",code:"CNY",issuer:"rCNY2929",pair:"CNY/XRP",group:"sdr",flag:"https://flagcdn.com/cn.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/L ocation_China.svg/250px-Location_China.svg.png",country:"China",iso:"CN",iso4217:"CNY",dates:"2016–present",lastUSD:"0.14",backing:"Managed",history:"Added  to SDR; export giant.",histValue:0.15,endYear:2016,growthRate:0.041},
+	{name:"Japanese Yen  (SDR)",code:"JPY",issuer:"rJPY3030",pair:"JPY/XRP",group:"sdr",flag:"https://flagcdn.com/jp.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Lo cation_Japan.svg/250px-Location_Japan.svg.png",country:"Japan",iso:"JP",iso4217:"JPY",dates:"1949–present",lastUSD:"0.0067",backing:"Float",history:"SDR  staple; yen carry trade.",histValue:0.009,endYear:1969,growthRate:0.041},	
+	{name:"Corporate Fuel Token  (CFT)",code:"CFT",issuer:"raMDb32m6b3BHJnBzZ6R5bMRDV5URsuCwx",pair:"CFT/XRP",group:"sdr",flag:"https://flagcdn.com/jp.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Lo cation_Japan.svg/250px-Location_Japan.svg.png",country:"Japan",iso:"JP",iso4217:"JPY",dates:"2024 - present",lastUSD:"0.01",backing:"Float",history:"SDR  staple; yen carry trade.",histValue:0.009,endYear:2028,growthRate:0.041}	
+];
+
+
+/* ---------- HELPERS ---------- */
+function randomChange() {
+  const change = (Math.random() * 10 - 5).toFixed(2);   // -5.00 … +5.00 %
+  const up    = change >= 0;
+  const arrow = up ? 'Up Arrow' : 'Down Arrow';  // &#8592; Unicode arrows
+  return { 
+    change: (up ? '+' : '') + change + '%', 
+    up, 
+    arrow 
+  };
+}
+
+/* ---------- MODAL ---------- */
+const modal = document.getElementById('infoModal');
+const closeBtn = document.querySelector('.close');
+
+window.openModal = function(idx) {
+  const c = currencies[idx];  // &#8592; now works!
+
+  document.getElementById('modalTitle').textContent = `${c.name} (${c.code})`;
+  document.getElementById('modalFlag').src = c.flag;
+  document.getElementById('modalMap').src = c.map;
+  document.getElementById('modalCountry').textContent = c.country;
+  document.getElementById('modalCurrency').textContent = c.name;
+  document.getElementById('modalISO').textContent = c.iso;
+  document.getElementById('modalISO4217').textContent = c.iso4217;
+  document.getElementById('modalDates').textContent = c.dates;
+  document.getElementById('modalLastUSD').textContent = c.lastUSD;
+  document.getElementById('modalBacking').textContent = c.backing;
+  document.getElementById('modalHistory').textContent = c.history;
+
+  const years = 2025 - c.endYear;
+  const hypo = calcHypothetical(c.histValue, years, c.growthRate);
+
+  const lostEl = document.getElementById('lostPotential');
+  lostEl.style.display = 'block';
+  document.getElementById('modalHypothetical').innerHTML = `~$${hypo.fv} USD (${hypo.multiplier}x growth)`;
+  document.getElementById('modalDetails').innerHTML = `
+    Formula: FV = $${c.histValue} × (1 + ${(c.growthRate*100).toFixed(1)}%)^${years} years<br>
+    Assumes ${c.group.includes('old') ? 'gold standard' : 'regional prosperity'} (no wars/unrest).<br>
+    Real avg rate: ${(c.growthRate*100).toFixed(1)}% (World Bank data).
+  `;
+
+  modal.style.display = 'flex';
+};
+
+// Close modal
+closeBtn.onclick = () => modal.style.display = 'none';
+window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
+
+
+
+/* ---------- LIVE PRICE FETCHER (ROBUST VERSION) ---------- */
+const tokenData = [
+  { id: 'cft', code: 'CFT', issuer: 'raMDb32m6b3BHJnBzZ6R5bMRDV5URsuCwx' }
+  // Add more: { id: 'iqd', code: 'IQD', issuer: 'rIQD456' }
+];
+
+async function fetchLivePrices() {
+  for (const token of tokenData) {
+    const cell = document.querySelector(`[data-token="${token.id}"]`);
+    if (!cell) continue;  // Skip if cell doesn't exist
+
+    try {
+      const url = `https://api.xpmarket.com/api/v1/ticker/${token.code}.${token.issuer}/XRP`;
+      const res = await fetch(url);
+      
+      if (!res.ok) {
+        cell.textContent = 'API Error';
+        cell.style.color = '#d00';
+        console.warn(`API not OK for ${token.code}: ${res.status}`);
+        continue;
+      }
+
+      const text = await res.text();  // Get raw text first
+      let data;
+
+      try {
+        data = JSON.parse(text);  // Try parsing as JSON
+      } catch (parseErr) {
+        // If not JSON (e.g., HTML), show API issue
+        cell.textContent = 'API Issue';
+        cell.style.color = '#d00';
+        console.warn(`Non-JSON response for ${token.code}:`, text.substring(0, 200) + '...');
+        continue;
+      }
+
+      // Valid JSON but no price?
+      if (!data?.price && !data?.last) {
+        cell.textContent = 'No Market';
+        cell.style.color = '#999';
+        cell.style.fontStyle = 'italic';
+        continue;
+      }
+
+      // Success
+      const price = data.price ?? data.last;
+      const formatted = Number(price).toFixed(8).replace(/\.?0+$/, '');  // Clean decimals
+      cell.textContent = formatted;
+      cell.style.color = '#28a745';  // Green for valid price
+      cell.style.fontStyle = 'normal';
+
+    } catch (e) {
+      cell.textContent = 'Network Error';
+      cell.style.color = '#d00';
+      console.error(`Full error for ${token.code}:`, e);
+    }
+  }
+}
+
+// Auto-refresh
+setInterval(fetchLivePrices, 30000);
+fetchLivePrices();  // Initial call
+
+/* ---------- RENDER TABLE ---------- */
+const tbody = document.querySelector('#currencyTable tbody');
+
+function renderGroup(group) {
+  tbody.innerHTML = '';
+  const sloganEl = document.getElementById('tabSlogan');
+
+  const filtered = (group === 'all'
+    ? currencies
+    : currencies.filter(c => c.group === group)
+  ).filter(c => !c.hidden);
+
+  /* ----- slogan ----- */
+  const firstWithSlogan = filtered.find(c => c.slogan);
+  if (firstWithSlogan && group !== 'all') {
+    sloganEl.textContent = `"${firstWithSlogan.slogan}"`;
+    sloganEl.style.display = 'block';
+  } else {
+    sloganEl.style.display = 'none';
+  }
+
+  /* ----- rows ----- */
+  filtered.forEach((c, filteredIdx) => {
+    const globalIdx = currencies.indexOf(c);
+    const {change, up, arrow} = randomChange();
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td data-label="Flag"><img src="${c.flag}" alt="${c.code} flag" class="flag-icon"></td>
+      <td data-label="Name">${c.name}</td>
+      <td data-label="Code">${c.code}</td>
+      <td data-label="Pair">${c.pair}</td>
+		<td data-label="Price/XRP" data-token="${c.code.toLowerCase()}"<!-- must match tokenData.id -->class="price-cell">Loading...</td>
+      <td data-label="Info"><button class="btn btn-info" onclick="openModal(${globalIdx})">More Info</button></td>
+      <td data-label="Change"><div class="change ${up?'up':'down'}"><span class="arrow">${arrow}</span><span>${change}</span></div></td>
+      <td data-label="Trade"><a href="https://xpmarket.com/dex/${c.code}-${c.issuer}/XRP?trade=market" target="_blank"><button class="btn">Buy/Sell</button></a></td>
+    `;
+
+    tbody.appendChild(row);
+  });
+
+  /* prices are updated globally – no need to pass anything */
+  fetchLivePrices();
+}
+
+/* ---------- CALC HYPOTHETICAL ---------- */
+function calcHypothetical(start, years, rate) {
+  const fv = (start * Math.pow(1 + rate, years)).toFixed(2);
+  const multiplier = (fv / start).toFixed(1);
+  return { fv, multiplier };
+}
+
+/* ---------- TAB SWITCHING ---------- */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGroup(btn.dataset.group);   // <-- uses the corrected data-group
+  });
+});
+
+/* ---------- INITIAL LOAD ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+  const active = document.querySelector('.tab-btn.active');
+  if (active) renderGroup(active.dataset.group);
+});
+</script>
+
+<script>
+// ---- DOCUMENT MODALS (White Paper & Warning) ----
+function openDocModal(id) {
+  document.getElementById(id).style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeDocModal(id) {
+  document.getElementById(id).style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+// click-outside to close
+window.addEventListener('click', function(e){
+  if (e.target.classList.contains('doc-modal')) {
+    e.target.style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+});
+</script>
+
+<!--Email popup-->
+<script>
+    function openPopup(id) {
+        document.getElementById(id).style.display = 'block';
+    }
+    function closePopup(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+    function updateCharCount() {
+        const textarea = document.getElementById('emailMessage');
+        const charCount = document.getElementById('charCount');
+        charCount.textContent = `${textarea.value.length}/500 characters`;
+    }
+    function sendEmail(event) {
+        event.preventDefault();
+        const subject = document.getElementById('emailSubject').value;
+        const message = document.getElementById('emailMessage').value;
+        const email = 'panorama.2018@proton.me'; // Replace with your email
+        const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+        window.location.href = mailtoLink;
+        closePopup('emailPopup');
+        openPopup('confirmationPopup'); // Show confirmation popup
+    }
+</script>
+</body>
 
