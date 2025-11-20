@@ -499,63 +499,79 @@ function renderGroup(group) {
 </script>
 
 <script>
-/* ---------- LIVE PRICE + ARROW UPDATE MODULE ---------- */
+/* -------------------------------------------------------
+   LIVE PRICE + ARROW MODULE (SAFE, NON-BLOCKING VERSION)
+   ------------------------------------------------------- */
 
-/* storage for all prices */
-const priceStore = {};    // priceStore[code] = { prev: X, curr: Y }
+const priceStore = {};   // priceStore[code] = { prev: X, curr: Y }
 
-/* Fetch live DEX price for ONE pair */
+/* Get live XRPL DEX price for 1 token */
 async function fetchPrice(code, issuer) {
   try {
-    const url = `https://s1.ripple.com:51234`;   // XRPL mainnet
-    const client = new xrpl.Client(url);
+    const client = new xrpl.Client("wss://s1.ripple.com");
     await client.connect();
 
-    const result = await client.getOrderbook({
+    const ob = await client.getOrderbook({
       base: { currency: code, issuer: issuer },
       counter: { currency: "XRP" }
     });
 
     client.disconnect();
 
-    if (!result.asks || result.asks.length === 0) return null;
+    if (!ob.asks || ob.asks.length === 0) return null;
 
-    // Best ask (cheapest price)
-    return parseFloat(result.asks[0].quality);
-  } 
-  catch (e) {
-    console.log("Error fetching price for", code, e);
+    return Number(ob.asks[0].quality);
+  }
+  catch (err) {
+    console.log(`Price error ${code}:`, err);
     return null;
   }
 }
 
-/* Fetch all prices and update arrows */
+/* Update priceStore safely */
 async function updateAllPrices() {
-
   for (const c of currencies) {
-    const price = await fetchPrice(c.code, c.issuer);
-
-    if (!price) continue;
+    const p = await fetchPrice(c.code, c.issuer);
+    if (!p) continue;
 
     if (!priceStore[c.code]) {
-      priceStore[c.code] = { prev: price, curr: price };
+      priceStore[c.code] = { prev: p, curr: p };
     } else {
       priceStore[c.code].prev = priceStore[c.code].curr;
-      priceStore[c.code].curr = price;
+      priceStore[c.code].curr = p;
     }
   }
 
-  /* Re-render current tab so arrows update */
+  // Re-render table AFTER prices exist
   const active = document.querySelector(".tab-btn.active");
   if (active) renderGroup(active.dataset.group);
 }
 
-/* update every 45 seconds */
-setInterval(updateAllPrices, 45000);
+/* NEVER BLOCK PAGE LOAD — run AFTER load */
+window.addEventListener("load", () => {
+  updateAllPrices();                // initial
+  setInterval(updateAllPrices, 45000); // every 45 sec
+});
 
-/* first load */
-updateAllPrices();
+/* ------- SAFE ARROW CALCULATION -------- */
+function getChangeDisplay(code) {
+  const p = priceStore[code];
+  if (!p) return { change: "0%", arrow: "↔", class: "no-change" };
+
+  const prev = p.prev;
+  const curr = p.curr;
+  if (!prev || !curr) return { change: "0%", arrow: "↔", class: "no-change" };
+
+  const diff = curr - prev;
+  const perc = ((diff / prev) * 100).toFixed(2);
+
+  if (perc > 0) return { change: "+" + perc + "%", arrow: "↑", class: "up" };
+  if (perc < 0) return { change: perc + "%", arrow: "↓", class: "down" };
+
+  return { change: "0%", arrow: "↔", class: "no-change" };
+}
 </script>
+
 
 
 <!--<script>
@@ -577,4 +593,3 @@ function getChangeDisplay(prevPrice, currentPrice) {
 
 </body>
 </html>
-
