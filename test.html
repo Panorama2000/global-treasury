@@ -499,78 +499,182 @@ function renderGroup(group) {
 </script>
 
 <script>
-/* -------------------------------------------------------
-   LIVE PRICE + ARROW MODULE (SAFE, NON-BLOCKING VERSION)
-   ------------------------------------------------------- */
+/* ============================================================
+   LIVE PRICE + ARROW MODULE
+   Works with AMM pools AND classic DEX orderbooks.
+   Auto-detects pair direction. Safe — will NOT break tables.
+============================================================ */
 
-const priceStore = {};   // priceStore[code] = { prev: X, curr: Y }
+const priceStore = {};   // priceStore["RLUSD"] = { prev: X, curr: Y }
 
-/* Get live XRPL DEX price for 1 token */
-async function fetchPrice(code, issuer) {
-  try {
-    const client = new xrpl.Client("wss://s1.ripple.com");
-    await client.connect();
+/* ------------------------------------------------------------
+   Extract pair information (handles "XRP/RLUSD" or "ARS/XRP")
+------------------------------------------------------------ */
+function parsePair(c) {
+    const [left, right] = c.pair.split("/");
 
-    const ob = await client.getOrderbook({
-      base: { currency: code, issuer: issuer },
-      counter: { currency: "XRP" }
-    });
-
-    client.disconnect();
-
-    if (!ob.asks || ob.asks.length === 0) return null;
-
-    return Number(ob.asks[0].quality);
-  }
-  catch (err) {
-    console.log(`Price error ${code}:`, err);
-    return null;
-  }
+    return {
+        base: left,
+        quote: right,
+        isBaseXRP: left === "XRP",
+        isQuoteXRP: right === "XRP"
+    };
 }
 
-/* Update priceStore safely */
-async function updateAllPrices() {
-  for (const c of currencies) {
-    const p = await fetchPrice(c.code, c.issuer);
-    if (!p) continue;
+/* ------------------------------------------------------------
+   Fetch price from AMM if available
+------------------------------------------------------------ */
+async function fetchAMMPrice(c) {
+    try {
+        const client = new xrpl.Client("wss://s1.ripple.com");
+        await client.connect();
 
-    if (!priceStore[c.code]) {
-      priceStore[c.code] = { prev: p, curr: p };
-    } else {
-      priceStore[c.code].prev = priceStore[c.code].curr;
-      priceStore[c.code].curr = p;
+        const { base, quote } = parsePair(c);
+
+        const amm = await client.request({
+            command: "amm_info",
+            asset: base === "XRP"
+                ? { currency: "XRP" }
+                : { currency: base, issuer: c.issuer },
+            asset2: quote === "XRP"
+                ? { currency: "XRP" }
+                : { currency: quote, issuer: c.issuer }
+        });
+
+        client.disconnect();
+
+        if (!amm.result?.amm) return null;
+
+        const pool = amm.result.amm;
+
+        const a = parseFloat(pool.amount);
+        const b = parseFloat(pool.amount2);
+
+        if (!a || !b) return null;
+
+        return a / b;  // AMM spot price
+    } catch {
+        return null;
     }
-  }
-
-  // Re-render table AFTER prices exist
-  const active = document.querySelector(".tab-btn.active");
-  if (active) renderGroup(active.dataset.group);
 }
 
-/* NEVER BLOCK PAGE LOAD — run AFTER load */
-window.addEventListener("load", () => {
-  updateAllPrices();                // initial
-  setInterval(updateAllPrices, 45000); // every 45 sec
-});
+/* ------------------------------------------------------------
+   Fetch price from orderbook (fallback)
+------------------------------------------------------------ */
+async function fetchOrderbookPrice(c) {
+    try {
+        const client = new xrpl.Client("wss://s1.ripple.com");
+        await client.connect();
 
-/* ------- SAFE ARROW CALCULATION -------- */
+        const { base, quote } = parsePair(c);
+
+        const res = await client.getOrderbook({
+            base: base === "XRP"
+                ? { currency: "XRP" }
+                : { currency: base, issuer: c.issuer },
+            counter: quote === "XRP"
+                ? { currency: "XRP" }
+                : { currency: quote, issuer: c.issuer }
+        });
+
+        client.disconnect();
+
+        if (!res.asks || res.asks.length === 0) return null;
+
+        return parseFloat(res.asks[0].quality);
+    } catch {
+        return null;
+    }
+}
+
+/* ------------------------------------------------------------
+   Get final price (AMM first, fallback to orderbook)
+------------------------------------------------------------ */
+async function fetchFinalPrice(c) {
+    let price = await fetchAMMPrice(c);
+
+    if (!price)
+        price = await fetchOrderbookPrice(c);
+
+    if (!price) return null;
+
+    const { base, quote } = parsePair(c);
+
+    // If your stored pair is reversed, correct the ratio
+    if (base === "XRP") price = 1 / price;
+
+    return price;
+}
+
+/* ------------------------------------------------------------
+   Update all prices and arrows
+------------------------------------------------------------ */
+async function updateAllPrices() {
+    for (const c of currencies) {
+
+        const price = await fetchFinalPrice(c);
+        if (!price) continue;
+
+        if (!priceStore[c.code]) {
+            priceStore[c.code] = { prev: price, curr: price };
+        } else {
+            priceStore[c.code].prev = priceStore[c.code].curr;
+            priceStore[c.code].curr = price;
+        }
+    }
+
+    // refresh active table only
+    const active = document.querySelector(".tab-btn.active");
+    if (active) renderGroup(active.dataset.group);
+}
+
+/* ------------------------------------------------------------
+   Arrow logic used by renderGroup()
+------------------------------------------------------------ */
 function getChangeDisplay(code) {
-  const p = priceStore[code];
-  if (!p) return { change: "0%", arrow: "↔", class: "no-change" };
+    const entry = priceStore[code];
 
-  const prev = p.prev;
-  const curr = p.curr;
-  if (!prev || !curr) return { change: "0%", arrow: "↔", class: "no-change" };
+    if (!entry) {
+        return {
+            change: "0.00%",
+            class: "neutral",
+            arrow: "→"
+        };
+    }
 
-  const diff = curr - prev;
-  const perc = ((diff / prev) * 100).toFixed(2);
+    const { prev, curr } = entry;
 
-  if (perc > 0) return { change: "+" + perc + "%", arrow: "↑", class: "up" };
-  if (perc < 0) return { change: perc + "%", arrow: "↓", class: "down" };
+    const diff = ((curr - prev) / prev) * 100;
 
-  return { change: "0%", arrow: "↔", class: "no-change" };
+    if (diff > 0) {
+        return {
+            change: diff.toFixed(2) + "%",
+            class: "up",
+            arrow: "▲"
+        };
+    }
+    if (diff < 0) {
+        return {
+            change: diff.toFixed(2) + "%",
+            class: "down",
+            arrow: "▼"
+        };
+    }
+    return {
+        change: "0.00%",
+        class: "neutral",
+        arrow: "→"
+    };
 }
+
+/* ------------------------------------------------------------
+   Start updating every 45s
+------------------------------------------------------------ */
+updateAllPrices();
+setInterval(updateAllPrices, 45000);
+
 </script>
+
 
 
 
