@@ -477,7 +477,7 @@ function renderGroup(group) {
     const prev = priceStore[c.code]?.prev || null;
     const curr = priceStore[c.code]?.curr || null;
 
-    const { change, class: changeClass, arrow } = getChangeDisplay(prev, curr);
+    const { change, class: changeClass, arrow } = getChangeDisplay(c.code);
 
     const row = document.createElement('tr');
     row.innerHTML = `
