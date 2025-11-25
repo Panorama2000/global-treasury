@@ -40,3 +40,10 @@ code = "IRR"
 name = "Iranian Rial"
 description = "Digital representation of the Iranian Rial (IRR) for the Treasury Series"
 icon = "https://raw.githubusercontent.com/panorama2000/global-treasury/main/flags/irr.png"
+
+# ─── VEF ───────────────────────────────────────────────
+[[ISSUERS.TOKENS]]
+code = "VEF"
+name = "Venezuelan Bolívar Fuerte"
+description = "Digital representation of the Venezuelan Bolívar Fuerte (VEF) for the Treasury Series"
+icon = "https://raw.githubusercontent.com/panorama2000/global-treasury/main/flags/vef.png"
