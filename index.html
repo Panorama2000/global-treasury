@@ -5,89 +5,119 @@
 <title>Global Forex Treasury</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="copyright" content="Copyright 2025 © Global Forex Treasury"> 
-<script src="https://unpkg.com/xrpl@2.13.0/dist/xrpl.min.js"></script>
 
 <style>
-  /* ---- BASIC RESET ---- */
-  *{margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  }
-  body{
-    font-family:Arial,Helvetica,sans-serif;
+/* ---- BASIC RESET ---- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     max-width: 1200px;
     margin: 10px auto;
     padding: 20px;
-    background-color: #f4f4f4;
-    color: #333;
+    color: #1a1a1a;   
     line-height: 1.5;
-  }
-  a{
-  text-decoration:none;
-  color:inherit;
-  }
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
 .section {
     background-color: #fff;
-    border: 1px solid #ddd;
     border-radius: 8px;
     border: 1px solid #0066cc;
-    padding: 20px 20px;
-    margin-bottom: 6px 6px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-  /* ---- HEADER ---- */
- header {
-    display: flex;
-    align-items: center;        /* Vertically center logo and title */
-    justify-content: center;    /* This will center the h1 in the available space */
-  	margin:4px 4px;
-  	padding: 20px 2px;
-  	border: 1px solid #0066cc;
-  	border-radius: 5px; 
-    position: relative;
-    gap: 20px;                  /* Space between logo and title */
+
+.container {
+    max-width: 1300px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
 }
+
 h1 {
-    font-size: 2.2rem;
+    text-align: center;
+    font-size: 2.8em;
     margin: 0;
     color: #1a1a1a;
-    flex: 1;                    /* Take up remaining space */
-    text-align: center;
+    flex: 1;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
+
+p.subtitle {
+    text-align: center;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    opacity: 0.9;
+    color: #1a1a1a;
+}
+</style>
+
+<style>
+/* ---- HEADER ---- */
+header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 4px;
+    padding: 20px 2px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid #0066cc;
+    border-radius: 5px;
+    position: relative;
+    gap: 20px;
+}
+
 .logo {
     max-width: 120px;
     height: auto;
-    position: absolute;         /* Pull logo to the left edge */
-    left: 15px;                 /* Match header padding */
+    position: absolute;
+    left: 15px;
     top: 50%;
-    transform: translateY(-50%); /* Perfect vertical centering */
+    transform: translateY(-50%);
 }
-footer{
-   text-align: left;
-   padding: 2px 2px;
-  	border: 1px solid #0066cc;
-  	border-radius: 5px;    
-   position: relative;
-   font-size:0.85rem;
-   margin: 4px 4px;
-       
+
+footer {
+    text-align: left;
+    padding: 2px;
+    border: 1px solid #0066cc;
+    border-radius: 5px;
+    position: relative;
+    font-size: 0.85rem;
+    color: #1e3c72;
+    margin: 4px;
 }
+
 @media (max-width: 480px) {
-  .logo { max-width: 120px; }
-  h1 { font-size: 1.8rem; }
+    .logo {
+        max-width: 120px;
+    }
 }
-  </style>
-  
+</style>
+
 <style>
-  /* ---- WALLET (top-right) ---- */
-  .wallet{
+/* ---- WALLET (top-right) ---- */
+.wallet {
     position: absolute;
     top: 15px;
     right: 15px;
     text-align: right;
     font-size: 0.9rem;
-  }
-  #walletBtn{
+}
+
+#walletBtn {
     background: #0066cc;
     color: #fff;
     border: none;
@@ -95,638 +125,697 @@ footer{
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
-  }
-  #walletBtn: hover{background:#004999;
-  }
-  
-  #walletStatus{
+}
+
+#walletBtn:hover {
+    background: #004999;
+}
+
+#walletStatus {
     margin-top: 10px;
     color: #555;
     font-family: monospace;
-  }
+}
 </style>
-  
-<style>
-  /* ---- TABLE ---- */
-  .container{
-  max-width:100%;
-  margin:4px 4px;
-  padding: 0px 0px;
-  border: 1px solid #0066cc;
-  border-radius: 5px; 
-  }
-  
-  table{
-    width:100%;
-    border-collapse:collapse;
-    background:#fff;
-    box-shadow:0 1px 4px rgba(0,0,0,0.1);
-  	border: none;
-  }
 
-  th{
-    background:#f0f0f0;
-    padding:10px 8px;
-    text-align:center;
-    font-weight:bold;
-    font-size:0.95rem;
-    border-bottom:1px solid #ddd;
-  }
-  td{
-    padding:10px 6px;
-    text-align:center;
-    border-bottom:1px solid #eee;
-  }
-  tr:hover{background:#f9f9f9;}
-</style>
-  
 <style>
-  /* ---- BUTTONS ---- */
-  .btn{
-    background:#0066cc;
-    color:#fff;
-    border:2px solid #004999;
-    padding:6px 10px;
-    border-radius:4px;
-    cursor:pointer;
-    font-size:0.85rem;
-    font-weight:bold;
-    min-width:78px;
-  }
-  .btn:hover{background:#004999;}
-  .btn-info{background:#17a2b8;border-color:#117a8b;}
-  .btn-info:hover{background:#117a8b;
-  }
+/* ---- TABLE ---- */
+.table-container {
+    max-width: 100%;
+    background: rgba(255,255,255,0.1);
+    margin: 4px;
+    padding: 0;
+    border: 1px solid #0066cc;
+    border-radius: 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.15);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+th {
+    background: #f0f0f0;
+    padding: 10px 8px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #ddd;
+}
+
+td {
+    padding: 10px 6px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+    background: #f9f9f9;
+}
+
+/* ---------- TABLE LAYOUT ---------- */
+#currencyTable {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+/* Column widths */
+#currencyTable th:nth-child(1), #currencyTable td:nth-child(1) { width: 10%; } /* Flag */
+#currencyTable th:nth-child(2), #currencyTable td:nth-child(2) { width: 25%; } /* Name */
+#currencyTable th:nth-child(3), #currencyTable td:nth-child(3) { width: 10%; } /* Code */
+#currencyTable th:nth-child(4), #currencyTable td:nth-child(4) { width: 10%; } /* Info */
+#currencyTable th:nth-child(5), #currencyTable td:nth-child(5) { width: 20%; } /* Pair */
+#currencyTable th:nth-child(6), #currencyTable td:nth-child(6) { width: 10%; } /* Change */
+#currencyTable th:nth-child(7), #currencyTable td:nth-child(7) { width: 15%; } /* Trade */
+
+#currencyTable td:nth-child(1) {
+    text-align: center;
+    padding: 4px 0;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+    table, thead, tbody, th, td, tr { display: block; }
+    thead tr { display: none; }
+    tr { margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; }
+    td { text-align: right; position: relative; padding-left: 50%; }
+    td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        font-weight: bold;
+        color: #ffd700;
+    }
+}
 </style>
-  
+
 <style>
-  /* ---- ARROW + % ---- */
+/* ---- BUTTONS ---- */
+.btn {
+    background: #0066cc;
+    color: #fff;
+    border: 2px solid #004999;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: bold;
+    min-width: 78px;
+}
+
+.btn:hover { background: #004999; }
+
+.btn-info {
+    background: #17a2b8;
+    border-color: #117a8b;
+}
+
+.btn-info:hover { background: #117a8b; }
+</style>
+
+<style>
+/* ---- ARROW + % ---- */
 .change {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
 }
 
 .change .arrow {
-  font-size: 1.1em;
+    font-size: 1.1em;
 }
 
 .change.up   { color: #0abb0a; }
 .change.down { color: #e63946; }
-  
 </style>
-  
+
 <style>
-  /* ---- MODAL ---- */
+/* === POPUP MODAL === */
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.8);
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  overflow: auto;
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
 }
+
 .modal-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 500px;
-  width: 100%;
-  position: relative;
-  color: #000;
+    background: white;
+    color: #333;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
+
 .close {
-  position: absolute;
-  top: 10px; right: 15px;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-  color: #aaa;
+    position: absolute;
+    top: 15px; right: 20px;
+    font-size: 2em;
+    cursor: pointer;
+    color: #aaa;
 }
-.close:hover { 
-	color: #000; 
+
+.close:hover { color: #000; }
+
+.flag-img {
+    width: 80px;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin: 10px;
 }
-.flag-img { 
-	width: 80px; 
-	height: auto; 
-	margin: 10px; 
-	border: 1px 
-	solid #ddd; 
-	}
-.map-img  { 
-	width: 200px; 
-	height: auto; 
-	margin: 10px; 
-	border: 1px 
-	solid #ddd; 
-	}
-.read-more { 
-	color: #0066cc; 
-	cursor: pointer; 
-	text-decoration:
-	underline; 
-	}
-.details { 
-	margin-top: 8px; 
-	font-size: 0.9em; 
-	color: #555; 
-	display: none; 
+
+.map-img {
+    width: 120px;
+    height: auto;
+    border-radius: 8px;
+    margin: 10px;
+}
+
+.modal h2 {
+    text-align: center;
+    color: #1e3c72;
+    margin-top: 0;
+}
+
+.modal p {
+    text-align: left;
+    line-height: 1.6;
+}
+
+.modal strong {
+    color: #1e3c72;
 }
 </style>
 
 <style>
-/* ==== DOCUMENT MODALS (White Paper & Warning) ==== */
+/* ==== DOCUMENT MODALS (White Paper & Warning & Reports) ==== */
 .doc-modal {
-  display: none;
-  position: fixed;
-  z-index: 1100;               /* higher than your info modal */
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.75);
-  overflow: auto;
+    display: none;
+    position: fixed;
+    z-index: 1100;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.75);
+    overflow: auto;
 }
+
 .doc-modal-content {
-  background: #fff;
-  margin: 20px auto;
-  padding: 22px;
-  width: 90%;
-  max-width: 720px;
-  border-radius: 12px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
-  position: relative;
-  max-height: 86vh;
-  overflow-y: auto;
+    background: #fff;
+    margin: 20px auto;
+    padding: 22px;
+    width: 90%;
+    max-width: 720px;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    position: relative;
+    max-height: 86vh;
+    overflow-y: auto;
 }
 
 .doc-close {
-  position: absolute;
-  top: 8px; right: 14px;
-  font-size: 30px;
-  font-weight: bold;
-  color: #999;
-  cursor: pointer;
+    position: absolute;
+    top: 8px; right: 14px;
+    font-size: 30px;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
 }
-.doc-close:hover {
-	color: #000;
-}
+
+.doc-close:hover { color: #000; }
+
 .doc-modal h2 { 
-	margin-top:0; 
-	color:#0066cc; 
-	border-bottom:2px solid #0066cc; 
-	padding-bottom:6px; 
+    margin-top: 0; 
+    color: #0066cc; 
+    border-bottom: 2px solid #0066cc; 
+    padding-bottom: 6px; 
 }
+
 #docPdfViewer {
-	width:100%; 
-	height:70vh; 
-	border:none; 
-	border-radius:8px; 
+    width: 100%; 
+    height: 70vh; 
+    border: none; 
+    border-radius: 8px; 
 }
-/* Footer buttons (same look as before) */
+
 .doc-footer-btn {
-  background:#0066cc; color:#fff; border:none;
-  padding:9px 15px; margin:0 6px;
-  border-radius:6px; cursor:pointer;
-  font-size:0.9rem; transition:0.2s;
+    background: #0066cc; 
+    color: #fff; 
+    border: none;
+    padding: 9px 15px; 
+    margin: 0 6px;
+    border-radius: 6px; 
+    cursor: pointer;
+    font-size: 0.9rem; 
+    transition: 0.2s;
 }
-.doc-footer-btn:hover { 
-	background:#004a99; 
-}
-/* ==== T&C WARNING MODAL – FIX BULLETS & FONT SIZE ==== */
+
+.doc-footer-btn:hover { background: #004a99; }
+
 #docWarningModal .doc-modal-content {
-  padding-left: 28px;     /* gives breathing room for bullets */
-  padding-right: 28px;
-  font-size: 0.90rem;     /* one size smaller (from ~16px &#8594; ~15px) */
-  line-height: 1.5;
+    padding-left: 28px; 
+    padding-right: 28px;
+    font-size: 0.90rem;
+    line-height: 1.5;
 }
 
 #docWarningModal ul {
-  margin-left: 18px;      /* indents bullet lists */
-  padding-left: 0;
+    margin-left: 18px;
+    padding-left: 0;
 }
 
 #docWarningModal li {
-  margin-bottom: 6px;
-  line-height: 1.2;  
-}
-</style>
-  
-<style>
-  /* ---- RESPONSIVE ---- */
-  @media (max-width:768px){
-    th,td{display:block;width:100%;text-align:right;padding-left:50%;}
-    th{display:none;}
-    td::before{
-      content:attr(data-label);
-      position:absolute;
-      left:12px;
-      font-weight:bold;
-      color:#0066cc;
-    }
-    td{border:none;padding:8px 12px;}
-    tr{margin-bottom:12px;border:1px solid #ddd;border-radius:6px;}
-  }
-  
-.slogan {
-  font-style: italic;
-  font-size:1.0rem;
-  color: #003366;
-  background: #f0f7ff;
-  padding: 10px;
-  border-radius: 5px;
-  margin-left: 10px;
-  margin-right: 10px;
-  max-width: 100%;
-  border: 1px solid #0066cc;
-}
-.price-cell {
-  font-family: 'Courier New', monospace;
-  font-weight: bold;
-  color: #00aa00;
-  text-align: center;
-  font-size: 0.9rem;
-}
-.price-cell::before { 
-  content: '&#8776; '; 
-  opacity: 0.7; 
+    margin-bottom: 6px;
+    line-height: 1.2;
 }
 
-.price-cell {
-  position: relative;
+#docCurrencyModal .doc-modal-content {
+    padding-left: 28px; 
+    padding-right: 28px;
+    font-size: 0.90rem;
+    line-height: 1.5;
 }
-.price-cell::after {
-  content: attr(title);
-  position: absolute;
-  bottom: 100%; left: 50%;
-  transform: translateX(-50%);
-  background: #333; color: #fff;
-  padding: 4px 8px; border-radius: 4px;
-  font-size: 0.7rem; white-space: nowrap;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.2s;
-  z-index: 10;
+
+#docCurrencyModal ul {
+    margin-left: 18px;
+    padding-left: 0;
 }
-.price-cell:hover::after {
-  opacity: 1;
+
+#docCurrencyModal li {
+    margin-bottom: 6px;
+    line-height: 1.2;
 }
+
 </style>
 
 <style>
-/* === TAB CONTAINER === */
+/* ==== TAB CONTAINER ==== */
 .tabs-container {
-  max-width:100%;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  border: 1px solid #0066cc;
-  border-radius: 5px;  
-  margin:4px 4px;
-  padding: 2px 2px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border: 1px solid #0066cc;
+    border-radius: 5px;
+    margin: 4px;
+    padding: 2px;
 }
 
 .tab-row {
-  display: flex;
-  gap: 6px;
+    display: flex;
+    gap: 6px;
 }
 
-/* === UNIFORM TAB BUTTONS === */
 .tab-btn {
-  flex: 1;                     /* Equal width */
-  min-width: 0;                /* Allow shrinking */
-  padding: 10px 4px;
-  font-size: 0.9rem;
-  text-align: center;
-  white-space: normal;         /* Allow word wrap */
-  word-wrap: break-word;       /* Break long words */
-  line-height: 1.3;
-  background: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
+    flex: 1;
+    min-width: 0;
+    padding: 10px 4px;
+    font-size: 0.9rem;
+    text-align: center;
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 1.3;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.tab-btn:hover {
-  background: #e0e0e0;
-}
+.tab-btn:hover { background: #e0e0e0; }
 
 .tab-btn.active {
-  background: #007bff;
-  color: white;
-  border-color: #0056b3;
+    background: #007bff;
+    color: white;
+    border-color: #0056b3;
 }
 
-/* Optional: Responsive – stack on very small screens */
 @media (max-width: 600px) {
-  .tab-row { flex-direction: column; }
-  .tab-btn { width: 100%; }
+    .tab-row { flex-direction: column; }
+    .tab-btn { width: 100%; }
 }
 </style>
 
 <style>
 /* Flag styling – modern & consistent */
 .flag-icon {
-  width: 32px;
-  height: 24px;
-  border-radius: 6px;
-  object-fit: cover;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  vertical-align: middle;
-  transition: transform .2s ease, box-shadow .2s ease;
+  	width: 32px;
+  	height: 24px;
+  	border-radius: 6px;
+  	object-fit: cover;
+  	box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  	vertical-align: middle;
+  	transition: transform .2s ease, box-shadow .2s ease;
 }
 .flag-icon:hover {
-  transform: scale(1.15);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  	transform: scale(1.15);
+  	box-shadow: 0 3px 8px rgba(0,0,0,0.3);
 }
 
 /* Optional: make the table look tighter on mobile */
-@media (max-width: 768px) {
-  #currencyTable th:nth-child(1), #currencyTable td:nth-child(1) { width: 8%; }   /* a bit wider on small screens */
-  #currencyTable th, #currencyTable td { font-size: 0.85rem; }
+	@media (max-width: 768px) {
+  	#currencyTable th:nth-child(1), #currencyTable td:nth-child(1) { width: 8%; }   /* a bit wider on small screens */
+  	#currencyTable th, #currencyTable td { font-size: 0.85rem; }
 }
 </style>
 
 <style>
-/* ---------- TABLE LAYOUT ---------- */
-#currencyTable {
-  width: 100%;
-  table-layout: fixed;          /*  forces column widths */
-  border-collapse: collapse;
-}
-
-/* Column widths – add up to 100% */
-#currencyTable th:nth-child(1), #currencyTable td:nth-child(1) { width:  6%; } /* Flag   */
-#currencyTable th:nth-child(2), #currencyTable td:nth-child(2) { width: 22%; } /* Name   */
-#currencyTable th:nth-child(3), #currencyTable td:nth-child(3) { width:  7%; } /* Code   */
-#currencyTable th:nth-child(4), #currencyTable td:nth-child(4) { width: 10%; } /* Pair   */
-#currencyTable th:nth-child(5), #currencyTable td:nth-child(5) { width: 12%; } /* Price  */
-#currencyTable th:nth-child(6), #currencyTable td:nth-child(6) { width: 12%; } /* Info   */
-#currencyTable th:nth-child(7), #currencyTable td:nth-child(7) { width: 10%; } /* Change */
-#currencyTable th:nth-child(8), #currencyTable td:nth-child(8) { width: 12%; } /* Trade  */
-
-/* Center the flag and give it a tiny padding so it doesn’t touch the cell edge */
-#currencyTable td:nth-child(1) {
-  text-align: center;
-  padding: 4px 0;               /* vertical breathing room only */
-}
-</style>
-
-<style>
-/* === CURRENCY SYMBOLS ROW === */
+/* ==== CURRENCY SYMBOLS ==== */
 .currency-symbols {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid #0066cc;
-  border-radius: 5px;  
-  margin:4px 4px;
-  padding: 20px 20px;
-  flex-wrap: wrap;           /* Wrap on very small screens */
-  max-width: 100%;          /* Optional: limit width */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #0066cc;
+    border-radius: 5px;
+    margin: 4px;
+    padding: 20px;
+    flex-wrap: wrap;
+    max-width: 100%;
 }
+
 .currency-symbols img {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  transition: transform 0.2s, box-shadow 0.2s;
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
+
 .currency-symbols img:hover {
-  transform: scale(1.15);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  z-index: 10;
+    transform: scale(1.15);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 10;
 }
+
 .currency-symbols img[alt="XRP"] {
-  animation: pulse 2s infinite;
+    animation: pulse 2s infinite;
 }
+
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.sym-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: #007bff;
+    font-weight: 400;
+    transition: transform 0.2s;
+}
+
+.sym-icon[data-alt="XRP"] {
+    font-size: 18px;
+    animation: pulse 2s infinite;
+}
+
+.sym-icon:hover {
+    transform: scale(1.15);
+    background: #e9ecef;
 }
 .sym-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  font-size: 24px;  /* Adjust for visibility */
-  background: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  color: #007bff;
-  font-weight: regular;
-  transition: transform 0.2s;
+    position: relative;
 }
-.sym-icon[alt="XRP"] {
-  font-size: 18px;  /* Adjust for visibility */
-  animation: pulse 2s infinite;
-}
-.sym-icon:hover {
-  transform: scale(1.15);
-  background: #e9ecef;
+
+.sym-icon:hover::after {
+    content: attr(data-alt);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 8px;
+    border-radius: 4px;
+    text-align:center;
+    font-size: 14px;
+    width: 120px;
+    z-index: 10;
+    white-space: normal;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 </style>
+
+<style>
+/* ==== PRICE CELL ==== */
+.price-cell {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: #00aa00;
+    text-align: center;
+    font-size: 0.9rem;
+    position: relative;  
+}
+
+.price-cell::before { 
+    content: "&#8776; ";
+    opacity: 0.7; 
+}
+
+.price-cell::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%; left: 50%;
+    transform: translateX(-50%);
+    background: #333; color: #fff;
+    padding: 4px 8px; border-radius: 4px;
+    font-size: 0.7rem; white-space: nowrap;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 10;
+}
+
+.price-cell:hover::after {
+    opacity: 1;
+}
+</style>
+
+<style>
+/* ==== SLOGAN ==== */
+.slogan {
+    font-style: italic;
+    font-size: 1rem;
+    color: #003366;
+    background: #f0f7ff;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 0 10px;
+    max-width: 100%;
+    border: 1px solid #0066cc;
+}
+</style>
+
 <script src="https://unpkg.com/xrpl@2.13.0/dist/xrpl.min.js"></script>
+
 </head>
 
-<body>
 <div class="section" id="tradingGroups">
-<div class="section">
-<header>
-  <img id="logo" src="earthlogo.jpeg" alt="Logo" class="logo" width="740" height="740">
-  <h1>Global Forex Treasury</h1>
-   <div class="wallet">
-    <button id="walletBtn">Connect Wallet</button>
-    <div id="walletStatus">Not connected</div>
-  </div>
-</header>
+  <div class="section">
 
+    <header>
+      <img id="logo" src="earthlogo.jpeg" alt="Logo" class="logo" width="740" height="740">
+      <h1>Global Forex Treasury</h1>
 
-  <!-- === CURRENCY SYMBOLS ROW (under title/logo) === -->
-<div class="sym-container">  
-	<div class="currency-symbols">
-	  <!--<img src=" " alt="XRP" title="XRP">
-	  <img src="https://via.placeholder.com/50?text=USD" alt="USD" title="USD">	  
-	  <img src="https://via.placeholder.com/50?text=EUR" alt="EUR" title="Euro">
-	  <img src="https://via.placeholder.com/50?text=JPY" alt="JPY" title="Japanese Yen">
-	  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/UAE_Dirham_Symbol.svg/40px-UAE_Dirham_Symbol.svg.png" alt="AED" title="UAE Dirham">
-	  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Pridnestrovie_ruble_sign.svg/40px-Pridnestrovie_ruble_sign.svg.png" alt="RUB" title="Russian Rubble">
-	  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Old_Sheqel_sign.svg/40px-Old_Sheqel_sign.svg.png" alt="ILS title="Israeli Shekel">
-	  <img src="https://via.placeholder.com/50?text=GOLD" alt="Gold" title="Gold Backed">-->
-	  	<span class="sym-icon" alt="USD_Dollar">&#36</span> <!-- USD -->
-  		<span class="sym-icon" alt="Euro">&#8364</span> <!-- EUR -->
-  		<span class="sym-icon" alt="British_Sterling">&#163</span> <!-- GBP -->
-  		<span class="sym-icon" alt="Japanese_Yen">&#165</span> <!-- JPY -->
-  		<span class="sym-icon" alt="Thai_Baht">&#3647</span> <!-- THB -->
-  		<span class="sym-icon" alt="Spanish_Passeta">&#8359</span> <!-- ESP -->
-  		<span class="sym-icon" alt="Russian_Rubble">&#8381</span> <!-- RUB -->
-  		<span class="sym-icon" alt="Greek_Drachma">&#8367</span> <!-- GRD -->
-  		<span class="sym-icon" alt="French_Franc">&#8355</span> <!-- FRF -->
-	  	<span class="sym-icon" alt="XRP">XRP</span> <!-- XRP -->	  		
-  		<span class="sym-icon" alt="Brazilian_Cruzero">&#8354</span> <!-- CRZ -->  		  		
-  		<span class="sym-icon" alt="Korean_Won">&#8361</span> <!-- WON -->
-  		<span class="sym-icon" alt="Italian_Lira">&#8356</span> <!-- ITL -->
-  		<span class="sym-icon" alt="Nigerian_Niara">&#8358</span> <!-- NGN -->
-  		<span class="sym-icon" alt="Mexican_Peso">&#8369</span> <!-- MXN -->
-  		<span class="sym-icon" alt="Vietnam_Dong">&#8363</span> <!-- VND -->
-  		<span class="sym-icon" alt="Indian_Rupee">&#8377</span> <!-- INR -->
-  		<span class="sym-icon" alt="Israeli_Shekle">&#8362</span> <!-- ILS -->  
-  		<span class="sym-icon" alt="Deutsch_Mark">&#8499</span> <!-- DEM -->    		  		  		  		  		  		 		
-	</div>
-</div>	
-	
+      <div class="wallet">
+        <!--<button id="walletBtn">Connect Wallet</button>
+        <div id="walletStatus">Not connected</div>-->
+      </div>
+    </header>
 
-  
-
-
-<!-- TABS -->
-<div class="tabs-container">
-<!--Row 1-->
-<div class="tab-row">
-  <button class="tab-btn active" data-group="exotics-rumor">Currency<br>Future Revaluation</button>
-  <button class="tab-btn" data-group="accord">Southern Africa<br>Self Determination Accord</button>
-  <button class="tab-btn" data-group="old">Historic Currencies<br> of Value</button>
-  <button class="tab-btn" data-group="britania">Britannic<br>Four Crowns</button>    
-  <button class="tab-btn" data-group="pre-euro">Pre-Euro<br>Currency values</button>
-</div>
-<!-- ROW 2 -->
-<div class="tab-row">
-    <button class="tab-btn" data-group="america">Cascades<br>North America</button>
-    <button class="tab-btn" data-group="latam">Latin &<br>Central America</button>
-    <button class="tab-btn" data-group="caribbean">Caribbean<br>Basin</button>    
-	 <button class="tab-btn" data-group="sadac">Sub Sahara<br>Southern African</button>
-	 <button class="tab-btn" data-group="wcafrica">West, Central & East<br>Africa Belt</button>
-	 <button class="tab-btn" data-group="levant">North Africa &<br>Middle East</button>
-</div>
-<!-- ROW 3 -->
-<div class="tab-row">
-	<button class="tab-btn" data-group="atlantic- eu">Europe & Britain<br>Euro Atlantic Realm</button>	 	 	 	 
-	<button class="tab-btn" data-group="scandinavia">Scandinavia<br>Nordic & Baltic Realm</button>
-	<button class="tab-btn" data-group="steppe">Eur-Asian<br>Stepp Belt</button>
-	<button class="tab-btn" data-group="india">Indian<br>Subcontinent</button>
-	<button class="tab-btn" data-group="east- asia">Orient & Far East</button>  
-	<button class="tab-btn" data-group="australia">Austral<br>Pacific Sphere</button>    
-</div>
-<!-- ROW 4 -->
-<div class="tab-row">    
-	<button class="tab-btn" data-group="trade">Trade Agreements</button>
-   	<button class="tab-btn" data-group="commodities">Commodities</button>
-	<button class="tab-btn" data-group="sdr">SDR</button>
-	<!-- Add more buttons here -->
-</div>
-</div>
-
-
-
-<div class="slogan" id="tabSlogan" style="display: none; text-align: center; font-weight: bold; color: #0066cc; margin: 4px 4px; align: center;"></div>
-<div class="container">
-  <table id="currencyTable">
-	<thead>
-  <tr>
-    <th data-label="Flag">Flag</th>      <!-- NEW -->
-    <th data-label="Name">Name</th>
-    <th data-label="Code">Code</th>
-    <th data-label="Pair">Pair</th>
-    <th data-label="Price/XRP">Price/XRP</th>
-    <th data-label="Info">Info</th>
-    <th data-label="Change">24h &#916;</th>
-    <th data-label="Trade">Trade</th>
-  </tr>
-	</thead>
-   <tbody></tbody>
-  </table>
-</div>
-
-<!-- ==== INFO MODAL ==== -->
-<div id="infoModal" class="modal">
-  <div class="modal-content">
-  	<div style="display: flex; gap: 5px; text-align:center; margin: 5px 5px; flex-wrap: wrap;"> 
-    	<span class="close">X</span>
-    	<img id="modalFlag" class="flag-img" loading="lazy" src="" alt="Flag">
-    	<h2 id="modalTitle"></h2>
+    <!-- === CURRENCY SYMBOLS ROW === -->
+    <div class="sym-container">
+      <div class="currency-symbols">
+        <!-- All others replaced with data-alt -->
+        <span class="sym-icon" data-alt="USD Dollar">&#36;</span>
+        <span class="sym-icon" data-alt="Euro">&#8364;</span>
+        <span class="sym-icon" data-alt="British Sterling">&#163;</span>
+        <span class="sym-icon" data-alt="Japanese Yen">&#165;</span>
+        <span class="sym-icon" data-alt="Thai Baht">&#3647;</span>
+        <span class="sym-icon" data-alt="Spanish Paseta">&#8359;</span>
+        <span class="sym-icon" data-alt="Russian Ruble">&#8381;</span>
+        <span class="sym-icon" data-alt="Greek Drachma">&#8367;</span>
+        <span class="sym-icon" data-alt="French Franc">&#8355;</span>
+        <span class="sym-icon" data-alt="XRP">XRP</span>
+        <span class="sym-icon" data-alt="Brazilian Cruzeiro">&#8354;</span>
+        <span class="sym-icon" data-alt="Korean Won">&#8361;</span>
+        <span class="sym-icon" data-alt="Italian Lira">&#8356;</span>
+        <span class="sym-icon" data-alt="Nigerian Naira">&#8358;</span>
+        <span class="sym-icon" data-alt="Mexican Peso">&#8369;</span>
+        <span class="sym-icon" data-alt="Vietnam Dong">&#8363;</span>
+        <span class="sym-icon" data-alt="Indian Rupee">&#8377;</span>
+        <span class="sym-icon" data-alt="Israeli Shekel">&#8362;</span>
+        <span class="sym-icon" data-alt="Deutsch Mark">&#8499;</span>
+      </div>
     </div>
-    <div style="text-align:right;">
-      	<img id="modalMap"  class="map-img"  loading="lazy" src="" alt="Map">
+
+    <!-- === TABS === -->
+    <div class="tabs-container">
+
+      <!-- ROW 1 -->
+      <div class="tab-row">
+        <button class="tab-btn active" data-group="exotics-rumor">Currency<br>Revaluation</button>
+        <button class="tab-btn" data-group="accord">Southern Africa<br>Self Determination Accord</button>
+        <button class="tab-btn" data-group="old">Historic Currencies<br>of Value</button>
+        <button class="tab-btn" data-group="britania">Britannic<br>Four Crowns</button>
+        <button class="tab-btn" data-group="pre-euro">Pre-Euro<br>Currency values</button>
+      </div>
+
+      <!-- ROW 2 -->
+      <div class="tab-row">
+        <button class="tab-btn" data-group="america">Cascades<br>North America</button>
+        <button class="tab-btn" data-group="latam">Latin &<br>Central America</button>
+        <button class="tab-btn" data-group="caribbean">Caribbean<br>Basin</button>
+        <button class="tab-btn" data-group="sadac">Sub Sahara<br>Southern African</button>
+        <button class="tab-btn" data-group="wcafrica">West, Central & East<br>Africa Belt</button>
+        <button class="tab-btn" data-group="levant">North Africa &<br>Middle East</button>
+      </div>
+
+      <!-- ROW 3 -->
+      <div class="tab-row">
+        <button class="tab-btn" data-group="atlantic-eu">Europe & Britain<br>Euro Atlantic Realm</button>
+        <button class="tab-btn" data-group="scandinavia">Scandinavia<br>Nordic & Baltic Realm</button>
+        <button class="tab-btn" data-group="steppe">Eur-Asian<br>Stepp Belt</button>
+        <button class="tab-btn" data-group="india">Indian<br>Subcontinent</button>
+        <button class="tab-btn" data-group="east-asia">Orient & Far East</button>
+        <button class="tab-btn" data-group="australia">Austral<br>Pacific Sphere</button>
+      </div>
+
+      <!-- ROW 4 -->
+      <div class="tab-row">
+        <button class="tab-btn" data-group="trade">Trade Agreements</button>
+        <button class="tab-btn" data-group="commodities">Commodities</button>
+        <button class="tab-btn" data-group="sdr">SDR</button>
+      </div>
+
     </div>
-    	<p><strong>Country:</strong> <span id="modalCountry"></span></p>
-    	<p><strong>Currency:</strong> <span id="modalCurrency"></span></p>
-    	<p><strong>ISO Country:</strong> <span id="modalISO"></span></p>
-    	<p><strong>ISO Currency:</strong> <span id="modalISO4217"></span></p>
-    	<p><strong>In Use:</strong> <span id="modalDates"></span></p>
-    	<p><strong>Last Day USD:</strong> <span id="modalLastUSD"></span></p>
-    	<p><strong>Backing:</strong> <span id="modalBacking"></span></p>
-    	<p><strong>History:</strong>
-    	<span id="modalHistory"></span></p>
-    	<div class="lost-potential" id="lostPotential" style="display:none;">
-            <p><strong>Lost Potential (If Prospered):</strong><br>
-      		<span id="modalHypothetical"></span><br>
-      		<span class="read-more" onclick="toggleDetails(this)">Read More (Math)</span>
-      		<div class="details" id="details">
-        		<span id="modalDetails"></span>
-      		</div>
-    	</div>
-  </div>
-</div>  
-    	
 
-<!-- ==== WHITE PAPER PDF MODAL ==== -->
-<div id="docWhitepaperModal" class="doc-modal">
-  <div class="doc-modal-content">
-    <span class="doc-close" onclick="closeDocModal('docWhitepaperModal')">&times;</span>
-    <h2>Global Forex Treasury – White Paper</h2>
-    <p><strong>Version 1.0&#8195;|&#8195;1 January  2025</strong></p>
-    <embed id="docPdfViewer" src="whitepaper.pdf" type="application/pdf" width="128" height="128">
-    <p style="text-align:center;margin-top:10px;color:#666;">
-      <em>Download: <a href="whitepaper.pdf" download>Save PDF</a></em>
-    </p>
-  </div>
-</div>
+    <div class="slogan" id="tabSlogan"
+      style="display:none;text-align:center;font-weight:bold;color:#0066cc;margin:4px 4px;">
+    </div>
 
-<!-- ==== T&C + CAVEAT EMPTOR WARNING MODAL ==== -->
-<div id="docWarningModal" class="doc-modal">
-  <div class="doc-modal-content">
-    <span class="doc-close" onclick="closeDocModal('docWarningModal')">&times;</span>
-    <h2><b>Terms, Conditions & Risk Disclosure</b></h2>
-    <p><strong>Last Updated: 01 January 2025</strong></p>
+    <!-- === TABLE === -->
+    <div class="table-container">
+      <table id="currencyTable">
+        <thead>
+          <tr>
+            <th data-label="Flag">Flag</th>
+            <th data-label="Name">Name</th>
+            <th data-label="Code">Code</th>
+            <th data-label="Info">Info</th>
+            <th data-label="Pair">Pair</th>
+            <!--<th data-label="Change">24h &#916;</th>-->
+            <th data-label="Trade">Trade</th>
+          </tr>
+        </thead>
+        <tbody id="currencyTableBody">
+          <!-- JS will generate rows -->
+        </tbody>
+      </table>
+    </div>
 
-    <h3><b>Caveat Emptor - Buyer Beware</b></h3>
-    <p><strong>TRADING DIGITAL ASSETS AND CURRENCIES IS EXTREMELY RISKY.</strong></p>
-    <p>All information on <strong>Global Forex Treasury</strong> is for <strong>educational and informational purposes only</strong>.<br>
-    This is <strong>not financial advice</strong>.</p>
+    <!-- === INFO MODAL === -->
+    <div id="infoModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="modalTitle"></h2>
 
-    <h3>Key Warnings</h3>
-      <p>1. You <strong>must conduct your own research (DYOR)</strong> before any trade.<br>
-      2. Prices on the XRP Ledger are <strong>volatile, illiquid, and speculative</strong>.<br>
-      3. Many listed currencies are <strong>not officially issued</strong> on XRPL - values are community-driven.<br>
-      4. <strong>No guarantees</strong> of profit, revaluation, or liquidity.<br>
-      5. You are <strong>solely responsible</strong> for your wallet, keys, and trades.</p>
-   
-    <h3>No Liability</h3>
-    <p><strong>Global Forex Treasury</strong>does <strong>not</strong>:</p>
-      <p>1. Execute trades !<br>
-      2. Hold funds or keys !<br>
-      3. Collect personal data 1<br>
-      4. Operate under any financial license !</p>
+        <div style="text-align:center;">
+          <img id="modalFlag" class="flag-img" loading="lazy" src="" alt="Flag">
+          <img id="modalMap" class="map-img" loading="lazy" src="" alt="Map">
+        </div>
 
-    <p>Trading Occurs on XRP Ledger. All "Trade" buttons link directly to <strong>decentralized XRPL interfaces.</strong></p><br>
-    <p> You interact <strong>at your own risk</strong> using your own wallet.</p>
-    <p>No individual or entity <!--claims ownership or-->takes liability for this platform.<!--It is<strong>open source</strong>(MIT license).--></p>
-    <hr>
-    <p style="text-align:center;font-style:italic;">
-      <strong>By using this site, you accept full responsibility for your own actions.</strong>
-    </p>
-  </div>
-</div>
+        <p><strong>Country:</strong>&nbsp;&nbsp;<span id="modalCountry"></span></p>
+        <p><strong>Currency:</strong>&nbsp;&nbsp;<span id="modalCurrency"></span></p>
+        <p><strong>ISO Country Code:</strong>&nbsp;&nbsp;<span id="modalISO"></span></p>
+        <p><strong>ISO Currency Code:</strong>&nbsp;&nbsp;<span id="modalISO4217"></span></p>
+        <p><strong>In Use:</strong>&nbsp;&nbsp;<span id="modalDates"></span></p>
+        <p><strong>Last Day Value (USD):</strong>&nbsp;&nbsp;<span id="modalLastUSD"></span></p>
+        <p><strong>Backing:</strong>&nbsp;&nbsp;<span id="modalBacking"></span></p>
+        <p><strong>History:</strong>&nbsp;&nbsp;<span id="modalHistory"></span></p>
 
+        <div class="lost-potential" id="lostPotential" style="display:none;">
+          <p><strong>Lost Potential:</strong>&nbsp;&nbsp;<span id="modalHypothetical"></span></p>
+          <p><strong><span class="read-more" onclick="toggleDetails(this)">Read More (Maths)</span></strong>&nbsp;&nbsp;<span id="modalDetails"></span></p>
+        </div>
+      </div>
+    </div>
 
-<!-- Email popup -->
-<div id="emailPopup" role="dialog" aria-modal="true" style="display: none; position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: white; padding: 20px; border: 2px solid navy; z-index: 200; width: 90%; max-width: 500px; border-radius: 12px;">
+    <!-- === WHITEPAPER MODAL === -->
+    <div id="docWhitepaperModal" class="doc-modal">
+      <div class="doc-modal-content">
+        <span class="doc-close" onclick="closeDocModal('docWhitepaperModal')">&times;</span>
+        <h2>Global Forex Treasury - White Paper</h2>
+        <p><strong>Version 1.0 | 1 January 2025</strong></p>
+    		<embed id="docPdfViewer" src="whitepaper.pdf" type="application/pdf" width="100%" height="600">
+        <p style="text-align:center;margin-top:10px;color:#666;">
+          <em>Download: <a href="whitepaper.pdf" download>Save PDF</a></em>
+        </p>
+      </div>
+    </div>
+
+    <!-- === WARNING MODAL === -->
+    <div id="docWarningModal" class="doc-modal">
+      <div class="doc-modal-content">
+        <span class="doc-close" onclick="closeDocModal('docWarningModal')">&times;</span>
+
+        <h2><b>Terms, Conditions & Risk Disclosure</b></h2>
+        <p><strong>Last Updated: 01 January 2025</strong></p>
+
+        <h3><b>Caveat Emptor - Buyer Beware</b></h3>
+        <p><strong>TRADING DIGITAL ASSETS AND CURRENCIES IS EXTREMELY RISKY.</strong></p>
+        <p>All information is for educational and informational purposes only.</p>
+        <p>This is <strong>not financial advice</strong>.</p>
+
+        <h3>Warnings</h3>
+        <p>1. DYOR</p>
+        <p>2. XRPL prices are volatile and speculative</p>
+        <p>3. Many currencies are community-issued</p>
+        <p>4. No guarantees of profit</p>
+        <p>5. You are responsible for keys and wallet</p>
+
+        <h3>No Liability</h3>
+        <p>Global Forex Treasury does not:</p>
+        <p>1. Execute trades<br>
+          2. Hold funds<br>
+          3. Collect personal data<br>
+          4. Operate under a financial license
+        </p>
+
+        <p>Trading occurs on XRPL. All trade links go directly to decentralized interfaces.</p>
+
+        <hr>
+
+        <p style="text-align:center;font-style:italic;">
+          <strong>By using this site, you accept full responsibility.</strong>
+        </p>
+
+      </div>
+    </div>
+
+    <!-- Email popup -->
+	<div id="emailPopup" role="dialog" aria-modal="true" style="display:none; position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: white; padding: 20px; border: 2px solid navy; z-index: 200; width: 90%; max-width: 500px; border-radius: 12px;">
     <h2 style="font-family: Tahoma; font-size: 24px; margin: 10px 0;">Send Us a Message</h2>
     <form id="emailForm" onsubmit="sendEmail(event)">
     <div style="margin-bottom: 10px;">
@@ -742,8 +831,7 @@ footer{
 
     <div style="margin-bottom: 10px;">
         <label for="emailMessage" style="font-family: Tahoma; font-size: 16px;">Message (max 500 characters):</label>
-        <textarea id="emailMessage" name="message" maxlength="500" style="font-family: Tahoma; font-size: 16px; width: 100%; height: 100px; padding: 5px;" oninput="updateCharCount()" rows="1" cols="20">
-        </textarea>
+        <textarea id="emailMessage" name="message" maxlength="500" style="font-family: Tahoma; font-size: 16px; width: 100%; height: 100px; padding: 5px;" oninput="updateCharCount()" rows="1" cols="20"></textarea>
         <p id="charCount" style="font-family: Tahoma; font-size: 14px; color: navy;">0/500 characters</p>
     </div>
 
@@ -752,34 +840,47 @@ footer{
         <button class="doc-footer-btn" onclick="closePopup('emailPopup')"><b>Close</b></button>
     </div>
     </form>
-</div>
-<!--End Emailpopup-->      					
+	</div>
+	<!--End Emailpopup-->      					
 
-<!-- Confirmation popup-->
-<div id="confirmationPopup" role="dialog" aria-modal="true" style="display: none; position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: white; padding: 20px; border: 2px solid navy; z-index: 200; width: 90%; max-width: 300px; border-radius: 12px;">
+	<!-- Confirmation popup-->
+	<div id="confirmationPopup" role="dialog" aria-modal="true" style="display:none; position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: white; padding: 20px; border: 2px solid navy; z-index: 200; width: 90%; max-width: 500px; border-radius: 12px;">
     <p style="font-family: Tahoma; font-size: 18px; margin: 10px 0; text-align: center;">Your message has been sent!</p>
     <div style="display: flex; justify-content: center;">
         <button class="doc-footer-btn" onclick="closePopup('confirmationPopup')"><b>Close</b></button>
     </div>
-</div>
-<!-- End confirmation Popup--> 
-
-
-
-<footer>
-	<div style="display: flex; gap: 20px; justify-content: center; margin:10px 10px; flex-wrap: wrap; font-size:0.8rem; color:#666; align-content:center;">
-	  	<p style="font-size:0.8rem;"><b>Global Forex Treasury | <!--Open Source |--> No Jurisdiction | Trade at Own Risk</b></p>
-	    <p style="cursor: pointer; margin: 0;" onclick="openDocModal('docWhitepaperModal')"><u><b>White paper</b></u></p>
-	    <p style="cursor: pointer; margin: 0;" onclick="openDocModal('docWarningModal')"><u><b>T&C & Warning</b></u></p>
-	    <p style="cursor: pointer; margin: 0;" onclick="openPopup('emailPopup')"><u><b>Contact Us</b></u></p>
-    
-    
-  		<!--<p style="text-align:center; margin:15px 0; font-size:0.8rem;">-->
-	    <!--<button class="doc-footer-btn" onclick="openDocModal('docWhitepaperModal')">White Paper</button>-->
-	    <!--<button class="doc-footer-btn" onclick="openDocModal('docWarningModal')">T&C & Warning</button>-->
-	    <!--<button class="doc-footer-btn" onclick="window.open('mailto:support@globalforextreasury.com')">Contact Us</button>-->
 	</div>
-	<div style="display: flex; gap: 20px; text-align:center; margin: 10px 10px; flex-wrap: wrap; font-size:0.8rem; color:#666;">    	
+	<!-- End confirmation Popup-->
+	
+    <!-- === Currency Reports === -->
+    <div id="docCurrencyModal" class="doc-modal">
+      <div class="doc-modal-content">
+        <span class="doc-close" onclick="closeDocModal('docCurrencyModal')">&times;</span>
+        <h2>Global Forex Treasury - Currency Reports</h2>
+        <p><strong>Version 1.0 | 1 January 2025</strong></p>
+        <p style="text-align:justify;margin-top:12px;color:#666;"><em><b>Download: IQD Report</b><a href="iqd.pdf" download><u>&nbsp;&nbsp;Save PDF</u></a></em></p>
+        <p style="text-align:justify;margin-top:12px;color:#666;"><em><b>Download: VND Report</b><a href="vnd.pdf" download><u>&nbsp;&nbsp;Save PDF</u></a></em></p>
+        <p style="text-align:justify;margin-top:12px;color:#666;"><em><b>Download: IDR Report</b><a href="idr.pdf" download><u>&nbsp;&nbsp;Save PDF</u></a></em></p>
+        <p style="text-align:justify;margin-top:12px;color:#666;"><em><b>Download: VEF Report</b><a href="vef.pdf" download><u>&nbsp;&nbsp;Save PDF</u></a></em></p>                        
+      </div>
+    </div> 
+
+	<footer>
+	<div style="display: flex; gap: 20px; justify-content: center; margin:10px 10px; flex-wrap: wrap; font-size:0.9rem; align-content:center;">
+		<p style="font-size:0.9rem;"><b>Global Forex Treasury | <!--Open Source |-->
+		No Jurisdiction | Trade at Own Risk</b></p>
+	</div>
+	<div style="display: flex; gap: 20px; justify-content: center; margin:10px 10px; flex-wrap: wrap; font-size:0.9rem; align-content:center;">
+		<p style="cursor: pointer; margin: 0;" onclick="openDocModal('docWhitepaperModal')"><u><b>White paper</b></u></p>
+		<p style="cursor: pointer; margin: 0;" onclick="openDocModal('docWarningModal')"><u><b>T&C & Warning</b></u></p>
+		<p style="cursor: pointer; margin: 0;" onclick="openPopup('emailPopup')"><u><b>Contact Us</b></u></p>
+		<p style="cursor: pointer; margin: 0;" onclick="openDocModal('docCurrencyModal')"><u><b>Currency Reports</b></u></p>		
+		<!--<p style="text-align:center; margin:15px 0; font-size:0.8rem;">-->
+		<!--<button class="doc-footer-btn" onclick="openDocModal('docWhitepaperModal')">White Paper</button>-->
+		<!--<button class="doc-footer-btn" onclick="openDocModal('docWarningModal')">T&C & Warning</button>-->
+		<!--<button class="doc-footer-btn" onclick="window.open('mailto:support@globalforextreasury.com')">Contact Us</button>-->
+	</div>
+	<div style="display: flex; gap: 20px; text-align:left; margin: 10px 10px; flex-wrap: wrap; font-size:0.8rem;">    	
 	  	<p>Copyright 2025 Global Forex Treasury</p>
 		<!-- Global Forex Treasury - Open Source under MIT License -->
 	  	<!-- === MIT LICENSE NOTICE === -->
@@ -788,75 +889,59 @@ footer{
 	    Open Source under the <a href="LICENSE" target="_blank" style="color:#0066cc; text-decoration:underline;">MIT License</a><br>
 	    No jurisdiction • No custody • Trade at your own risk
 	  	</p>-->
-	</div>  	
-</footer>
+	</div>
+	</footer>  	    
+
+  </div>
+</div>
+
 
 <!--===ALL JAVA SCRIPTING===-->
 <script>
 /* ---------- WALLET ---------- */
-let walletAddress = null;
-document.getElementById('walletBtn').onclick = async () => {
-  if (!window.xrpl) { alert('XRPL lib not loaded'); return; }
-  try {
-    const client = new xrpl.Client('wss://s1.ripple.com');
-    await client.connect();
-    const seed = prompt('Enter XRP secret (optional):') || '';
-    const wallet = seed ? xrpl.Wallet.fromSeed(seed) : null;
-    walletAddress = wallet ? wallet.classicAddress : null;
-    document.getElementById('walletStatus').textContent = 
-      walletAddress ? `Connected: ${walletAddress.slice(0,8)}...${walletAddress.slice(-6)}` : 'Not connected';
-    client.disconnect();
-  } catch(e){ alert('Connection failed'); }
-};
-
-/* ---------- TOGGLE DETAILS ---------- */
-function toggleDetails(el) {
-  const details = el.nextElementSibling;
-  details.classList.toggle('show');
-  el.textContent = details.classList.contains('show') ? 'Read Less' : 'Read More (Math)';
-}
 
 /* ---------- CURRENCY DATA ---------- */
 const currencies = [
   	// === EXOTICS REVALUATION (5.2%) ===
-	{name:"Vietnamese Dong",code:"VND",issuer:"rVND123",pair:"VND/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/vn.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Vietnam_%28orthographic_projection%29.svg/330px-Vietnam_%28orthographic_projection%29.svg.png",country:"Vietnam",iso:"VN",iso4217:"VND",dates:"1978 - present",lastUSD:"0.00004",backing:"Managed Float",history:"Post-war devaluation; rumored RV due to export growth.",histValue:0.00014,endYear:1978,growthRate:0.052},
-	{name:"Iraqi Dinar(Saddam Era)",code:"IQD",issuer:"rIQD456",pair:"IQD/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/iq.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Iraq_%28orthographic%29.svg/250px-Iraq_%28orthographic%29.svg.png",country:"Iraq",iso:"IQ",iso4217:"IQD",dates:"1990 - present",lastUSD:"0.00076",backing:"Oil Peg",history:"Pre-war strong; sanctions/wars caused fall; RV rumors persist.",histValue:0.33,endYear:1990,growthRate:0.052,slogan:"The Revaluation Lives On"},
-	{name:"Indonesian Rupiah",code:"IDR",issuer:"rIDR789",pair:"IDR/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/id.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Indonesia_%28orthographic_projection%29.svg/250px-Indonesia_%28orthographic_projection%29.svg.png",country:"Indonesia",iso:"ID",iso4217:"IDR",dates:"1997 - present",lastUSD:"0.000065",backing:"USD Peg",history:"Asian crisis devalued 80%; RV speculation on commodities.",histValue:0.00042,endYear:1997,growthRate:0.052},
-	{name:"Iranian Rial",code:"IRR",issuer:"rIRR101",pair:"IRR/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/ir.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Iran_%28orthographic_projection%29.svg/250px-Iran_%28orthographic_projection%29.svg.png",country:"Iran",iso:"IR",iso4217:"IRR",dates:"1979 - present",lastUSD:"0.000024",backing:"Oil",history:"Revolution led to sanctions; hyper devaluation rumors.",histValue:0.0143,endYear:1979,growthRate:0.052},
-	{name:"Venezuelan Bolivar Fuerte",code:"VEF",issuer:"rVEF202",pair:"VEF/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/ve.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Venezuela_Orthographic_Map.svg/250px-Venezuela_Orthographic_Map.svg.png",country:"Venezuela",iso:"VE",iso4217:"VEF",dates:"2010 - present",lastUSD:"0.23",backing:"Oil",history:"Hyperinflation from unrest; RV hype on reserves.",histValue:0.23,endYear:2010,growthRate:0.052},
-	{name:"Zimbabwe Dollar (2008 Hyper)",code:"ZWD",issuer:"rZWD303",pair:"ZWD/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/zw.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Zimbabwe_%28orthographic_projection%29.svg/250px-Zimbabwe_%28orthographic_projection%29.svg.png",country:"Zimbabwe",iso:"ZW",iso4217:"ZWD",dates:"2008",lastUSD:"0.00000003",backing:"None (Hyper)",history:"100T note issued; peak inflation 79.6B%; RV rumors post-dollarization.",histValue:0.00000003,endYear:2008,growthRate:0.052},
-	{name:"Thai Baht",code:"THB",issuer:"rTHB404",pair:"THB/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/th.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Thailand_%28orthographic_projection%29.svg/330px-Thailand_%28orthographic_projection%29.svg.png",country:"Thailand",iso:"TH",iso4217:"THB",dates:"1997 - present",lastUSD:"0.028",backing:"Managed Float",history:"Asian crisis survivor; RV speculation on tourism boom.",histValue:0.03,endYear:1997,growthRate:0.052,hidden:true},
-	{name:"Malaysian Ringgit",code:"MYR",issuer:"rMYR505",pair:"MYR/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/my.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Malaysia_%28orthographic_projection%29.svg/250px-Malaysia_%28orthographic_projection%29.svg.png",country:"Malaysia",iso:"MY",iso4217:"MYR",dates:"1998 - present",lastUSD:"0.23",backing:"USD Peg",history:"1998 crisis peg; rumored uplift on oil/palm.",histValue:0.26,endYear:1998,growthRate:0.052,hidden:true},
-	{name:"Philippine Peso",code:"PHP",issuer:"rPHP606",pair:"PHP/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/ph.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/PHL_orthographic.svg/250px-PHL_orthographic.svg.png",country:"Philippines",iso:"PH",iso4217:"PHP",dates:"1998 - present",lastUSD:"0.04",backing:"Managed Float",history:"Asian crisis deval; RV on remittances.",histValue:0.02,endYear:1998,growthRate:0.052,hidden:true},
-	{name:"Korean Won",code:"KRW",issuer:"rKRW707",pair:"KRW/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/kr.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Republic_of_Korea_%28orthographic_projection%29.svg/250px-Republic_of_Korea_%28orthographic_projection%29.svg.png",country:"South Korea",iso:"KR",iso4217:"KRW",dates:"1997 - present",lastUSD:"0.0009",backing:"Float",history:"1997 IMF crisis; rumored reval on tech exports.",histValue:0.0008,endYear:1997,growthRate:0.052,hidden:true},
-	{name:"Argentine Peso",code:"ARS",issuer:"rARS808",pair:"ARS/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/ar.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Argentina_%28including_claimed_territories%2C_orthographic_projection%29.svg/250px-Argentina_%28including_claimed_territories%2C_orthographic_projection%29.svg.png",country:"Argentina",iso:"AR",iso4217:"ARS",dates:"2001 - present",lastUSD:"0.001",backing:"USD Peg Collapse",history:"2001 default; chronic RV rumors.",histValue:1.00,endYear:2001,growthRate:0.052},
-	{name:"Turkish Lira",code:"TRY",issuer:"rTRY909",pair:"TRY/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/tr.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Turkey_%28orthographic_projection%29.svg/250px-Turkey_%28orthographic_projection%29.svg.png",country:"Turkey",iso:"TR",iso4217:"TRY",dates:"2005 - present",lastUSD:"0.03",backing:"Inflation Prone",history:"Post - 2005 reform; RV on geopolitics.",histValue:0.0015,endYear:2005,growthRate:0.052,hidden:true},
+	{name:"Vietnamese Dong",code:"VND",issuer:"rfMn82VTEYy1yESztX2kZ6BCmcEkExZ6Bn",pair:"VND/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/vn.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Vietnam_%28orthographic_projection%29.svg/330px-Vietnam_%28orthographic_projection%29.svg.png",country:"Vietnam",iso:"VN",iso4217:"VND",dates:"1978 - present",lastUSD:"0.00004",backing:"Managed Float",history:"Post-war devaluation; rumored RV due to export growth.",histValue:0.00014,endYear:1978,growthRate:0.052,slogan:"Economics 101  -  Supply and Demand !"},
+	{name:"Iraqi Dinar(Saddam Era)",code:"IQD",issuer:"rfMn82VTEYy1yESztX2kZ6BCmcEkExZ6Bn",pair:"IQD/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/iq.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Iraq_%28orthographic%29.svg/250px-Iraq_%28orthographic%29.svg.png",country:"Iraq",iso:"IQ",iso4217:"IQD",dates:"1990 - present",lastUSD:"0.00076",backing:"Oil Peg",history:"Pre-war strong; sanctions/wars caused fall; RV rumors persist.",histValue:0.33,endYear:1990,growthRate:0.052},
+	{name:"Indonesian Rupiah",code:"IDR",issuer:"rfMn82VTEYy1yESztX2kZ6BCmcEkExZ6Bn",pair:"IDR/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/id.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Indonesia_%28orthographic_projection%29.svg/250px-Indonesia_%28orthographic_projection%29.svg.png",country:"Indonesia",iso:"ID",iso4217:"IDR",dates:"1997 - present",lastUSD:"0.000065",backing:"USD Peg",history:"Asian crisis devalued 80%; RV speculation on commodities.",histValue:0.00042,endYear:1997,growthRate:0.052},
+	{name:"Iranian Rial",code:"IRR",issuer:"rfMn82VTEYy1yESztX2kZ6BCmcEkExZ6Bn",pair:"IRR/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/ir.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Iran_%28orthographic_projection%29.svg/250px-Iran_%28orthographic_projection%29.svg.png",country:"Iran",iso:"IR",iso4217:"IRR",dates:"1979 - present",lastUSD:"0.000024",backing:"Oil",history:"Revolution led to sanctions; hyper devaluation rumors.",histValue:0.0143,endYear:1979,growthRate:0.052},
+	{name:"Venezuelan Bolivar Fuerte",code:"VEF",issuer:"rfMn82VTEYy1yESztX2kZ6BCmcEkExZ6Bn",pair:"VEF/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/ve.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Venezuela_Orthographic_Map.svg/250px-Venezuela_Orthographic_Map.svg.png",country:"Venezuela",iso:"VE",iso4217:"VEF",dates:"2017 -2018",lastUSD:"0.23",backing:"Oil",history:"Hyperinflation from unrest; RV hype on reserves.",histValue:0.23,endYear:2018,growthRate:0.052,hidden:true},
+	{name:"Zimbabwe Dollar (2008 Hyper)",code:"ZWR",issuer:"rfMn82VTEYy1yESztX2kZ6BCmcEkExZ6Bn",pair:"ZWR/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/zw.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Zimbabwe_%28orthographic_projection%29.svg/250px-Zimbabwe_%28orthographic_projection%29.svg.png",country:"Zimbabwe",iso:"ZW",iso4217:"ZWR",dates:"2009",lastUSD:"0.00000003",backing:"None (Hyper)",history:"100T note issued; peak inflation 79.6B%; RV rumors post-dollarization.",histValue:0.00000003,endYear:2008,growthRate:0.052,hidden:true},
+	{name:"Thai Baht",code:"THB",issuer:"rfMn82VTEYy1yESztX2kZ6BCmcEkExZ6Bn",pair:"THB/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/th.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Thailand_%28orthographic_projection%29.svg/330px-Thailand_%28orthographic_projection%29.svg.png",country:"Thailand",iso:"TH",iso4217:"THB",dates:"1997 - present",lastUSD:"0.028",backing:"Managed Float",history:"Asian crisis survivor; RV speculation on tourism boom.",histValue:0.03,endYear:1997,growthRate:0.052,hidden:true},
+	{name:"Malaysian Ringgit",code:"MYR",issuer:"rfMn82VTEYy1yESztX2kZ6BCmcEkExZ6Bn",pair:"MYR/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/my.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Malaysia_%28orthographic_projection%29.svg/250px-Malaysia_%28orthographic_projection%29.svg.png",country:"Malaysia",iso:"MY",iso4217:"MYR",dates:"1998 - present",lastUSD:"0.23",backing:"USD Peg",history:"1998 crisis peg; rumored uplift on oil/palm.",histValue:0.26,endYear:1998,growthRate:0.052,hidden:true},
+	{name:"Philippine Peso",code:"PHP",issuer:"rfMn82VTEYy1yESztX2kZ6BCmcEkExZ6Bn",pair:"PHP/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/ph.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/PHL_orthographic.svg/250px-PHL_orthographic.svg.png",country:"Philippines",iso:"PH",iso4217:"PHP",dates:"1998 - present",lastUSD:"0.04",backing:"Managed Float",history:"Asian crisis deval; RV on remittances.",histValue:0.02,endYear:1998,growthRate:0.052,hidden:true},
+	{name:"Korean Won",code:"KRW",issuer:"rfMn82VTEYy1yESztX2kZ6BCmcEkExZ6Bn",pair:"KRW/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/kr.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Republic_of_Korea_%28orthographic_projection%29.svg/250px-Republic_of_Korea_%28orthographic_projection%29.svg.png",country:"South Korea",iso:"KR",iso4217:"KRW",dates:"1997 - present",lastUSD:"0.0009",backing:"Float",history:"1997 IMF crisis; rumored reval on tech exports.",histValue:0.0008,endYear:1997,growthRate:0.052,hidden:true},
+	{name:"Argentine Peso",code:"ARS",issuer:"rfMn82VTEYy1yESztX2kZ6BCmcEkExZ6Bn",pair:"ARS/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/ar.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Argentina_%28including_claimed_territories%2C_orthographic_projection%29.svg/250px-Argentina_%28including_claimed_territories%2C_orthographic_projection%29.svg.png",country:"Argentina",iso:"AR",iso4217:"ARS",dates:"2001 - present",lastUSD:"0.001",backing:"USD Peg Collapse",history:"2001 default; chronic RV rumors.",histValue:1.00,endYear:2001,growthRate:0.052},
+	{name:"Turkish Lira",code:"TRY",issuer:"rfMn82VTEYy1yESztX2kZ6BCmcEkExZ6Bn",pair:"TRY/XRP",group:"exotics-rumor",flag:"https://flagcdn.com/tr.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Turkey_%28orthographic_projection%29.svg/250px-Turkey_%28orthographic_projection%29.svg.png",country:"Turkey",iso:"TR",iso4217:"TRY",dates:"2005 - present",lastUSD:"0.03",backing:"Inflation Prone",history:"Post - 2005 reform; RV on geopolitics.",histValue:0.0015,endYear:2005,growthRate:0.052,hidden:true},
    
   	// === SOUTHERN AFRICA ACCORD (6.0%) ===
-	{name:"Oranje Dollar",code:"ORD",issuer:"rORD7272",pair:"ORD/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Location_map_of_Orange_Free_State.svg/250px-Location_map_of_Orange_Free_State.svg.png",country:"Oranje",iso:"OR",iso4217:"ORD",dates:"2025+",lastUSD:"0.10",backing:"Gold, maize, wheat, uranium",history:"New accord; Boer heritage revival.",histValue:0.10,endYear:2025,growthRate:0.060,slogan:"New Dawn for Southern Africa"},
+	{name:"Oranie Ora",code:"ORA",issuer:"rORD7272",pair:"ORD/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Location_map_of_Orange_Free_State.svg/250px-Location_map_of_Orange_Free_State.svg.png",country:"Oranje",iso:"OR",iso4217:"ORD",dates:"2025+",lastUSD:"0.10",backing:"Gold, maize, wheat, uranium",history:"New accord; Boer heritage revival.",histValue:0.10,endYear:2025,growthRate:0.060,slogan:"New Dawn for Southern Africa"},
 	{name:"Kaapland Dollar",code:"KAD",issuer:"rKAD7373",pair:"KAD/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Map_of_Cape_Colony_in_1896.svg/250px-Map_of_Cape_Colony_in_1896.svg.png",country:"Kaapland",iso:"KA",iso4217:"KAD",dates:"2025+",lastUSD:"0.15",backing:"Wine, deciduous fruit, tech, tourism",history:"Cape revival; port focus.",histValue:0.15,endYear:2025,growthRate:0.060},
 	{name:"Mzansi Zanzi",code:"MZZ",issuer:"rMZZ7474",pair:"MZZ/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Location_South_Africa.svg/250px-Location_South_Africa.svg.png",country:"Mzansi",iso:"MZ",iso4217:"MZZ",dates:"2025+",lastUSD:"0.20",backing:"Platinum, gold, manufacturing, finance",history:"Rainbow nation core.",histValue:0.20,endYear:2025,growthRate:0.060},
 	{name:"Xhosaland Cedi",code:"XHC",issuer:"rXHC7575",pair:"XHC/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Location_Transkei.svg/250px-Location_Transkei.svg.png",country:"Xhosaland",iso:"XH",iso4217:"XHC",dates:"2025+",lastUSD:"0.12",backing:"Cattle, citrus, eco-tourism",history:"Xhosa cultural strength.",histValue:0.12,endYear:2025,growthRate:0.060},
 	{name:"Zululand Mali",code:"ZUM",issuer:"rZUM7676",pair:"ZUM/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Zululand_1890.png/250px-Zululand_1890.png",country:"Kingdom of Zululand",iso:"ZU",iso4217:"ZUM",dates:"2025+",lastUSD:"0.18",backing:"Sugar cane, coal, eco-tourism",history:"Zulu royal revival.",histValue:0.18,endYear:2025,growthRate:0.060},
-	{name:"Tsongaland Pula",code:"TSP",issuer:"rTSP7777",pair:"TSP/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Tsonga_homeland.png/250px-Tsonga_homeland.png",country:"Tsongaland",iso:"TS",iso4217:"TSP",dates:"2025+",lastUSD:"0.13",backing:"Timber exporting, bananas, cross-border trade, citrus, avocado exports, tourism",history:"Tsonga coastal focus.",histValue:0.13,endYear:2025,growthRate:0.060},
+	{name:"Tsongaland Pula",code:"TSP",issuer:"rTSP7777",pair:"TSP/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/South_Africa_2011_Tsonga_speakers_proportion_map.svg/250px-South_Africa_2011_Tsonga_speakers_proportion_map.svg.png",country:"Tsongaland",iso:"TS",iso4217:"TSP",dates:"2025+",lastUSD:"0.13",backing:"Timber exporting, bananas, cross-border trade, citrus, avocado exports, tourism",history:"Tsonga coastal focus.",histValue:0.13,endYear:2025,growthRate:0.060},
 	{name:"Koisan Khoi",code:"KHK",issuer:"rKHK7878",pair:"KHK/XRP",group:"accord",flag:"https://via.placeholder.com/70x50?text=No+Flag",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Khoisan_homelands.png/250px-Khoisan_homelands.png",country:"Koisan Kingdom",iso:"KH",iso4217:"KHK",dates:"2025+",lastUSD:"0.11",backing:"Diamonds, semi-precious stones, solar, San heritage tourism",history:"Khoisan ancient rights.",histValue:0.11,endYear:2025,growthRate:0.060},
 
   	// === OLD CURRENCIES (4.3%)===
 	{name:"Rhodesian Dollar",code:"RHD",issuer:"rRHD5959",pair:"RHD/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Flag_of_Rhodesia_%281968%E2%80%931979%29.svg/250px-Flag_of_Rhodesia_%281968%E2%80%931979%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Map_of_Rhodesia.png/250px-Map_of_Rhodesia.png",country:"Rhodesia",iso:"RH",iso4217:"RHD",dates:"1970 - 1980",lastUSD:"1.47",backing:"Sterling Peg",history:"UDI sanctions; replaced by ZWD.",histValue:1.47,endYear:1980,growthRate:0.043,slogan:"Lost Empires, Hidden Value"},
-	{name:"Rhodesian Pound(Pre-Dollar)",code:"RHP",issuer:"rRHP6565",pair:"RHP/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Flag_of_Southern_Rhodesia_%281924%E2%80%931964%29.svg/250px-Flag_of_Southern_Rhodesia_%281924%E2%80%931964%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Map_of_Rhodesia.png/250px-Map_of_Rhodesia.png",country:"Rhodesia",iso:"RH",iso4217:"RHP",dates:"1956 - 1970",lastUSD:"2.80",backing:"Sterling",history:"Federation era.",histValue:2.80,endYear:1960,growthRate:0.043},
+	{name:"Rhodesian Pound (Pre-Dollar)",code:"RHP",issuer:"rRHP6565",pair:"RHP/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Flag_of_Southern_Rhodesia_%281924%E2%80%931964%29.svg/250px-Flag_of_Southern_Rhodesia_%281924%E2%80%931964%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Map_of_Rhodesia.png/250px-Map_of_Rhodesia.png",country:"Rhodesia",iso:"RH",iso4217:"RHP",dates:"1956 - 1970",lastUSD:"2.80",backing:"Sterling",history:"Federation era.",histValue:2.80,endYear:1960,growthRate:0.043},
 	{name:"South African Pound",code:"ZAP",issuer:"rZAP6060",pair:"ZAP/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Flag_of_South_Africa_%281928-1982%29.svg/250px-Flag_of_South_Africa_%281928-1982%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Location_South_Africa.svg/250px-Location_South_Africa.svg.png",country:"South Africa",iso:"ZA",iso4217:"ZAP",dates:"1923 - 1961",lastUSD:"2.40",backing:"Gold",history:"Pre-decimal; apartheid era strength.",histValue:2.40,endYear:1961,growthRate:0.043},
-	{name:"Transvaal Boer Pond",code:"TVP",issuer:"rTVP6262",pair:"TVP/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Flag_of_Transvaal.svg/250px-Flag_of_Transvaal.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Map_of_the_South_African_Republic_%28Transvaal%29_in_1899.svg/250px-Map_of_the_South_African_Republic_%28Transvaal%29_in_1899.svg.png",country:"Transvaal",iso:"TV",iso4217:"TVP",dates:"1892 - 1902",lastUSD:"4.87",backing:"Gold (1oz)",history:"Boer War ended; Kruger gold.",histValue:4.87,endYear:1902,growthRate:0.043},
+	{name:"Transvaal Veld Pond",code:"TVP",issuer:"rTVP6262",pair:"TVP/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Flag_of_Transvaal.svg/250px-Flag_of_Transvaal.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Map_of_the_South_African_Republic_%28Transvaal%29_in_1899.svg/250px-Map_of_the_South_African_Republic_%28Transvaal%29_in_1899.svg.png",country:"Transvaal Republiek",iso:"TV",iso4217:"TVP",dates:"1892 - 1902",lastUSD:"4.87",backing:"Gold",history:"Boer War ended; Kruger gold.",histValue:4.87,endYear:1902,growthRate:0.043},
 	{name:"Confederate Dollar",code:"CSD",issuer:"rCSD6161",pair:"CSD/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Flag_of_the_Confederate_States_%281861%E2%80%931863%29.svg/250px-Flag_of_the_Confederate_States_%281861%E2%80%931863%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Confederate_States_of_America_map.svg/250px-Confederate_States_of_America_map.svg.png",country:"Confederate States",iso:"CS",iso4217:"CSD",dates:"1861 - 1865",lastUSD:"0.0167",backing:"Cotton",history:"Civil War hyperinflation; worthless post-surrender.",histValue:0.0167,endYear:1865,growthRate:0.043},
 	{name:"Hawaiian Dollar",code:"HWD",issuer:"rHWD6363",pair:"HWD/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Flag_of_Hawaii.svg/250px-Flag_of_Hawaii.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Hawaii_in_United_States.svg/250px-Hawaii_in_United_States.svg.png",country:"Hawaii",iso:"HW",iso4217:"HWD",dates:"1884 - 1903",lastUSD:"1.00",backing:"Silver",history:"Kingdom annexation.",histValue:1.00,endYear:1898,growthRate:0.043},
 	{name:"Confederate States Treasury Note",code:"CSTN",issuer:"rCSTN6464",pair:"CSTN/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Flag_of_the_Confederate_States_%281861%E2%80%931863%29.svg/330px-Flag_of_the_Confederate_States_%281861%E2%80%931863%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Confederate_States_of_America_map.svg/250px-Confederate_States_of_America_map.svg.png",country:"Confederate States",iso:"CS",iso4217:"CSTN",dates:"1861 - 1864",lastUSD:"0.33",backing:"Bonds",history:"Early war notes; rapid deval.",histValue:0.33,endYear:1864,growthRate:0.043, hidden:true},
 	{name:"Newfoundland Dollar",code:"NFD",issuer:"rNFD6666",pair:"NFD/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Flag_of_the_Dominion_of_Newfoundland.svg/250px-Flag_of_the_Dominion_of_Newfoundland.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Newfoundland_in_Canada.svg/250px-Newfoundland_in_Canada.svg.png",country:"Newfoundland",iso:"NF",iso4217:"NFD",dates:"1865 - 1949",lastUSD:"1.00",backing:"British Gold",history:"Pre-Confederation.",histValue:1.00,endYear:1949,growthRate:0.043},
-	{name:"Australian Pound(Pre-Decimal)",code:"AUP",issuer:"rAUP6767",pair:"AUP/XRP",group:"old",flag:"https://flagcdn.com/au.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Location_map_Australia.png/250px-Location_map_Australia.png",country:"Australia",iso:"AU",iso4217:"AUP",dates:"1910 - 1966",lastUSD:"2.24",backing:"Gold",history:"Imperial peg.",histValue:2.24,endYear:1966,growthRate:0.043},
-	{name:"Canadian Dollar(Pre-Confed)",code:"CADP",issuer:"rCADP6868",pair:"CADP/XRP",group:"old",flag:"https://flagcdn.com/ca.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Location_Canada.svg/250px-Location_Canada.svg.png",country:"Canada",iso:"CA",iso4217:"CADP",dates:"1858 - 1867",lastUSD:"1.00",backing:"Silver/Gold",history:"Colonial notes.",histValue:1.00,endYear:1867,growthRate:0.043},
+	{name:"Australian Pound (Pre-Decimal)",code:"AUP",issuer:"rAUP6767",pair:"AUP/XRP",group:"old",flag:"https://flagcdn.com/au.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Location_map_Australia.png/250px-Location_map_Australia.png",country:"Australia",iso:"AU",iso4217:"AUP",dates:"1910 - 1966",lastUSD:"2.24",backing:"Gold",history:"Imperial peg.",histValue:2.24,endYear:1966,growthRate:0.043},
+	{name:"Canadian Dollar(Pre-Confed)",code:"CADP",issuer:"rCADP6868",pair:"CADP/XRP",group:"old",flag:"https://flagcdn.com/ca.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Location_Canada.svg/250px-Location_Canada.svg.png",country:"Canada",iso:"CA",iso4217:"CADP",dates:"1858 - 1867",lastUSD:"1.00",backing:"Silver/Gold",history:"Colonial notes.",histValue:1.00,endYear:1867,growthRate:0.043,hidden:true},
 	{name:"British Guiana Dollar",code:"BGD",issuer:"rBGD6969",pair:"BGD/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Flag_of_British_Guiana_%281916%E2%80%931966%29.svg/100px-Flag_of_British_Guiana_%281916%E2%80%931966%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Map_of_British_Guiana_1885.svg/250px-Map_of_British_Guiana_1885.svg.png",country:"British Guiana",iso:"GY",iso4217:"BGD",dates:"1839 - 1966",lastUSD:"0.75",backing:"Sterling",history:"Colonial sugar economy.",histValue:0.75,endYear:1966,growthRate:0.043,hidden:true},
 	{name:"East African Florin",code:"EAF",issuer:"rEAF7070",pair:"EAF/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Flag_of_British_East_Africa.svg/100px-Flag_of_British_East_Africa.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/East_Africa_Protectorate_1920.png/250px-East_Africa_Protectorate_1920.png",country:"East Africa",iso:"EA",iso4217:"EAF",dates:"1920 - 1921",lastUSD:"1.00",backing:"Sterling",history:"Short-lived union.",histValue:1.00,endYear:1921,growthRate:0.043,hidden:true},
 	{name:"Straits Dollar",code:"SSD",issuer:"rSSD7171",pair:"SSD/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Flag_of_the_Strait_Settlements_%28pre-1874%29.svg/100px-Flag_of_the_Strait_Settlements_%28pre-1874%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Map_of_the_Straits_Settlements.svg/250px-Map_of_the_Straits_Settlements.svg.png",country:"Straits Settlements",iso:"SS",iso4217:"SSD",dates:"1903 - 1939",lastUSD:"0.50",backing:"Silver",history:"Trade hub.",histValue:0.50,endYear:1939,growthRate:0.043,hidden:true},
 	{name:"Danish Rigsdaler(Pre-Krone)",code:"DKR",issuer:"rDKR3636",pair:"DKR/XRP",group:"old",flag:"https://flagcdn.com/dk.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Location_Denmark.svg/250px-Location_Denmark.svg.png",country:"Denmark",iso:"DK",iso4217:"DKR",dates:"1813 - 1875",lastUSD:"0.27",backing:"Silver",history:"Pre-union silver coin.",histValue:0.27,endYear:1875,growthRate:0.043,hidden:true},
 	{name:"Swedish Riksdaler(Pre-Krona)",code:"SEDR",issuer:"rSEDR3737",pair:"SEDR/XRP",group:"old",flag:"https://flagcdn.com/se.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Location_Sweden_Europe.svg/250px-Location_Sweden_Europe.svg.png",country:"Sweden",iso:"SE",iso4217:"SEDR",dates:"1776 - 1873",lastUSD:"0.27",backing:"Silver",history:"Pre-gold standard.",histValue:0.27,endYear:1873,growthRate:0.043,hidden:true},
+	{name:"Spanish Dollar (Onza de Oro)",code:"ORO",issuer:"rSEDR3737",pair:"ORO/XRP",group:"old",flag:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cross_of_Burgundy_%28Template%29.svg/250px-Cross_of_Burgundy_%28Template%29.svg.png",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Map_of_the_Caribbean-Greater_Antilles.png/250px-Map_of_the_Caribbean-Greater_Antilles.png",country:"Spanish Empire",iso:"OR",iso4217:"ORO",dates:"1537 - 1859",lastUSD:"0.27",backing:"Gold",history:"Spanish Gold, one of the most famous and widely used coins in history! Other name is Doubloons or Pirate Gold. Value today $3000 - $8000 (average circulated)",histValue:"0.27",endYear:1859,growthRate:0.043},
 
  	// === UK-SPLIT ===
   	{name:"England Pound",code:"GBP",issuer:"rGBP001",pair:"GBP/XRP",group:"britania",flag:"https://flagcdn.com/gb-eng.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/England_in_the_UK_and_Europe.svg/250px-England_in_the_UK_and_Europe.svg.png",country:"England (Albion)",iso:"EN",iso4217:"GBP",dates:"1707 - present",lastUSD:"1.27",backing:"Sterling Sovereign",history:"Core of Pound Sterling. What if England minted solo?",histValue:1.50,endYear:1707,growthRate:0.052,slogan:"4 Kingdoms, back to Financial Independance and Wealth"},
@@ -1080,7 +1165,7 @@ const currencies = [
 	{name:"Indonesian Rupiah (Lesser  Sundas)",code:"IDR",issuer:"rIDR913",pair:"IDR/XRP",group:"australia",flag:"https://flagcdn.com/id.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/ 9f/Location_Indonesia.svg/250px-Location_Indonesia.svg.png",country:"Indonesia (Lesser Sundas)",iso:"ID-NU",iso4217:"IDR",dates:"1965– present",lastUSD:"0.000066",backing:"Tourism",history:"Eastern islands.",histValue:0.000066,endYear:1965,growthRate:0.052},
 	
 	// === TRADE ===
-	{name:"BRICS Unity Note",code:"BUN",issuer:"rBUN001",pair:"BUN/XRP",group:"trade",flag:"https://flagcdn.com/br.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/BRICS_map.svg/250px-BRICS_map.svg.png",country:"BRICS",iso:"BR",iso4217:"BUN",dates:"2025–future",lastUSD:"1.00",backing:"GDP Basket",history:"Emerging powers unite. Trade in BUN, not USD?",histValue:1.00,endYear:2025,growthRate:0.06,slogan:"Lets trade with each other and become very wealthy - What have you got to barter"},
+	{name:"BRICS Unity Note",code:"BUN",issuer:"rBUN001",pair:"BUN/XRP",group:"trade",flag:"https://flagcdn.com/br.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/BRICS_map.svg/250px-BRICS_map.svg.png",country:"BRICS",iso:"BR",iso4217:"BUN",dates:"2025–future",lastUSD:"1.00",backing:"GDP Basket",history:"Emerging powers unite. Trade in BUN, not USD?",histValue:1.00,endYear:2025,growthRate:0.06,slogan:"Trade with Me Only so I can become very wealthy - What have you got to Barter"},
 	{name:"AfCFTA Africa Single",code:"AFS",issuer:"rAFS002",pair:"AFS/XRP",group:"trade",flag:"https://flagcdn.com/za.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Africa_orthographic.svg/250px-Africa_orthographic.svg.png",country:"Africa",iso:"AF",iso4217:"AFS",dates:"2025–future",lastUSD:"0.80",backing:"Pan-African Trade",history:"54 nations, one currency. The rise of AFS.",histValue:0.80,endYear:2025,growthRate:0.06},
 	{name:"RCEP Pacific Pact",code:"RPP",issuer:"rRPP003",pair:"RPP/XRP",group:"trade",flag:"https://flagcdn.com/cn.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/RCEP_members.svg/250px-RCEP_members.svg.png",country:"Asia-Pacific",iso:"RP",iso4217:"RPP",dates:"2025–future",lastUSD:"1.10",backing:"Trade Volume",history:"Largest trade bloc. RPP vs USD?",histValue:1.10,endYear:2025,growthRate:0.06},
 	{name:"GCC Gulf Dinar",code:"GCD",issuer:"rGCD004",pair:"GCD/XRP",group:"trade",flag:"https://flagcdn.com/sa.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/GCC_map.svg/250px-GCC_map.svg.png",country:"Gulf States",iso:"GC",iso4217:"GCD",dates:"2025–future",lastUSD:"3.00",backing:"Oil & Gold",history:"Petrodollar killer? GCD rises.",histValue:3.00,endYear:2025,growthRate:0.06},
@@ -1091,7 +1176,7 @@ const currencies = [
 	{name:"Silver Reserve",code:"XAG",issuer:"rXAG002",pair:"XAG/XRP",group:"commodities",flag:"silver2.jpeg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Silver_mining_world_map.svg/250px-Silver_mining_world_map.svg.png",country:"Global",iso:"XX",iso4217:"XAG",dates:"Ancient–present",lastUSD:"32",backing:"Physical Silver",history:"The people's precious metal. Industrial + monetary demand rising.",histValue:20,endYear:2000,growthRate:0.052},
 	{name:"Platinum Reserve",code:"XPT",issuer:"rXPT003",pair:"XPT/XRP",group:"commodities",flag:"platinum2.jpeg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Platinum_mining_in_South_Africa.svg/250px-Platinum_mining_in_South_Africa.svg.png",country:"Global",iso:"XX",iso4217:"XPT",dates:"1900–present",lastUSD:"1050",backing:"Physical Platinum",history:"Rare, catalytic, green tech fuel. Supply squeezed.",histValue:800,endYear:2000,growthRate:0.052},
 	{name:"Copper Reserve",code:"XCU",issuer:"rXCU004",pair:"XCU/XRP",group:"commodities",flag:"copper1.jpeg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Copper_mining_world.svg/250px-Copper_mining_world.svg.png",country:"Global",iso:"XX",iso4217:"XCU",dates:"2025–future",lastUSD:"9500",backing:"Per Metric Ton",history:"Wires the world. EV boom = copper supercycle?",histValue:6000,endYear:2020,growthRate:0.052},
-	{name:"Crude Oil Reserve",code:"XBR",issuer:"rXBR005",pair:"XBR/XRP",group:"commodities",flag:"crude1.jpeg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Oil_reserves_world_map.svg/250px-Oil_reserves_world_map.svg.png",country:"Global",iso:"XX",iso4217:"XBR",dates:"1973–present",lastUSD:"82",backing:"Brent Barrel",history:"Energy blood. What if oil traded in XBR, not petrodollars?",histValue:100,endYear:2020,growthRate:0.052},
+	{name:"Crude Oil Reserve",code:"XBR",issuer:"rXBR005",pair:"XBR/XRP",group:"commodities",flag:"crude1.jpeg",map: "https:://upload.wikimedia.org/wikipediw/commons/thumb/9/9f/Oil_drilling_world.svg/s50px-Oil_drilling_world.svg.png",country:"Global",iso:"XX",iso4217:"XBR",dates:"1973–present",lastUSD:"82",backing:"Brent Barrel",history:"Energy blood. What if oil traded in XBR, not petrodollars?",histValue:100,endYear:2020,growthRate:0.052},
 	
   	// === SDR (4.1%) ===
 	{name:"Special Drawing  Rights",code:"SDR",issuer:"rSDR2626",pair:"SDR/XRP",group:"sdr",flag:"https://flagcdn.com/un.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/65 /Circle-icons-globe.svg/250px-Circle-icons-globe.svg.png",country:"IMF",iso:"UN",iso4217:"XDR",dates:"1969–present",lastUSD:"1.33",backing:"Basket  (USD,EUR,CNY,JPY,GBP)",history:"Global reserve asset; stable by design.",histValue:1.00,endYear:1969,growthRate:0.041,slogan:"Global Watchdog - Big Daddy is watching your Economy"},
@@ -1102,164 +1187,11 @@ const currencies = [
 	{name:"Corporate Fuel Token  (CFT)",code:"CFT",issuer:"raMDb32m6b3BHJnBzZ6R5bMRDV5URsuCwx",pair:"CFT/XRP",group:"sdr",flag:"https://flagcdn.com/jp.svg",map:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Lo cation_Japan.svg/250px-Location_Japan.svg.png",country:"Japan",iso:"JP",iso4217:"JPY",dates:"2024 - present",lastUSD:"0.01",backing:"Float",history:"SDR  staple; yen carry trade.",histValue:0.009,endYear:2028,growthRate:0.041}	
 ];
 
-
-/* ---------- HELPERS ---------- */
-function randomChange() {
-  const change = (Math.random() * 10 - 5).toFixed(2);   // -5.00 … +5.00 %
-  const up    = change >= 0;
-  const arrow = up ? 'Up Arrow' : 'Down Arrow';  // &#8592; Unicode arrows
-  return { 
-    change: (up ? '+' : '') + change + '%', 
-    up, 
-    arrow 
-  };
-}
-
-/* ---------- MODAL ---------- */
-const modal = document.getElementById('infoModal');
-const closeBtn = document.querySelector('.close');
-
-window.openModal = function(idx) {
-  const c = currencies[idx];  // &#8592; now works!
-
-  document.getElementById('modalTitle').textContent = `${c.name} (${c.code})`;
-  document.getElementById('modalFlag').src = c.flag;
-  document.getElementById('modalMap').src = c.map;
-  document.getElementById('modalCountry').textContent = c.country;
-  document.getElementById('modalCurrency').textContent = c.name;
-  document.getElementById('modalISO').textContent = c.iso;
-  document.getElementById('modalISO4217').textContent = c.iso4217;
-  document.getElementById('modalDates').textContent = c.dates;
-  document.getElementById('modalLastUSD').textContent = c.lastUSD;
-  document.getElementById('modalBacking').textContent = c.backing;
-  document.getElementById('modalHistory').textContent = c.history;
-
-  const years = 2025 - c.endYear;
-  const hypo = calcHypothetical(c.histValue, years, c.growthRate);
-
-  const lostEl = document.getElementById('lostPotential');
-  lostEl.style.display = 'block';
-  document.getElementById('modalHypothetical').innerHTML = `~$${hypo.fv} USD (${hypo.multiplier}x growth)`;
-  document.getElementById('modalDetails').innerHTML = `
-    Formula: FV = $${c.histValue} × (1 + ${(c.growthRate*100).toFixed(1)}%)^${years} years<br>
-    Assumes ${c.group.includes('old') ? 'gold standard' : 'regional prosperity'} (no wars/unrest).<br>
-    Real avg rate: ${(c.growthRate*100).toFixed(1)}% (World Bank data).
-  `;
-
-  modal.style.display = 'flex';
-};
-
-// Close modal
-closeBtn.onclick = () => modal.style.display = 'none';
-window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
-
-
-
-/* ---------- LIVE PRICE FETCHER (ROBUST VERSION) ---------- */
-const tokenData = [
-  { id: 'cft', code: 'CFT', issuer: 'raMDb32m6b3BHJnBzZ6R5bMRDV5URsuCwx' }
-  // Add more: { id: 'iqd', code: 'IQD', issuer: 'rIQD456' }
-];
-
-async function fetchLivePrices() {
-  for (const token of tokenData) {
-    const cell = document.querySelector(`[data-token="${token.id}"]`);
-    if (!cell) continue;  // Skip if cell doesn't exist
-
-    try {
-      const url = `https://api.xpmarket.com/api/v1/ticker/${token.code}.${token.issuer}/XRP`;
-      const res = await fetch(url);
-      
-      if (!res.ok) {
-        cell.textContent = 'API Error';
-        cell.style.color = '#d00';
-        console.warn(`API not OK for ${token.code}: ${res.status}`);
-        continue;
-      }
-
-      const text = await res.text();  // Get raw text first
-      let data;
-
-      try {
-        data = JSON.parse(text);  // Try parsing as JSON
-      } catch (parseErr) {
-        // If not JSON (e.g., HTML), show API issue
-        cell.textContent = 'API Issue';
-        cell.style.color = '#d00';
-        console.warn(`Non-JSON response for ${token.code}:`, text.substring(0, 200) + '...');
-        continue;
-      }
-
-      // Valid JSON but no price?
-      if (!data?.price && !data?.last) {
-        cell.textContent = 'No Market';
-        cell.style.color = '#999';
-        cell.style.fontStyle = 'italic';
-        continue;
-      }
-
-      // Success
-      const price = data.price ?? data.last;
-      const formatted = Number(price).toFixed(8).replace(/\.?0+$/, '');  // Clean decimals
-      cell.textContent = formatted;
-      cell.style.color = '#28a745';  // Green for valid price
-      cell.style.fontStyle = 'normal';
-
-    } catch (e) {
-      cell.textContent = 'Network Error';
-      cell.style.color = '#d00';
-      console.error(`Full error for ${token.code}:`, e);
-    }
-  }
-}
-
-// Auto-refresh
-setInterval(fetchLivePrices, 30000);
-fetchLivePrices();  // Initial call
-
-/* ---------- RENDER TABLE ---------- */
-const tbody = document.querySelector('#currencyTable tbody');
-
-function renderGroup(group) {
-  tbody.innerHTML = '';
-  const sloganEl = document.getElementById('tabSlogan');
-
-  const filtered = (group === 'all'
-    ? currencies
-    : currencies.filter(c => c.group === group)
-  ).filter(c => !c.hidden);
-
-  /* ----- slogan ----- */
-  const firstWithSlogan = filtered.find(c => c.slogan);
-  if (firstWithSlogan && group !== 'all') {
-    sloganEl.textContent = `"${firstWithSlogan.slogan}"`;
-    sloganEl.style.display = 'block';
-  } else {
-    sloganEl.style.display = 'none';
-  }
-
-  /* ----- rows ----- */
-  filtered.forEach((c, filteredIdx) => {
-    const globalIdx = currencies.indexOf(c);
-    const {change, up, arrow} = randomChange();
-
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td data-label="Flag"><img src="${c.flag}" alt="${c.code} flag" class="flag-icon"></td>
-      <td data-label="Name">${c.name}</td>
-      <td data-label="Code">${c.code}</td>
-      <td data-label="Pair">${c.pair}</td>
-		<td data-label="Price/XRP" data-token="${c.code.toLowerCase()}"<!-- must match tokenData.id -->class="price-cell">Loading...</td>
-      <td data-label="Info"><button class="btn btn-info" onclick="openModal(${globalIdx})">More Info</button></td>
-      <td data-label="Change"><div class="change ${up?'up':'down'}"><span class="arrow">${arrow}</span><span>${change}</span></div></td>
-      <td data-label="Trade"><a href="https://xpmarket.com/dex/${c.code}-${c.issuer}/XRP?trade=market" target="_blank"><button class="btn">Buy/Sell</button></a></td>
-    `;
-
-    tbody.appendChild(row);
-  });
-
-  /* prices are updated globally – no need to pass anything */
-  fetchLivePrices();
+/* ---------- TOGGLE DETAILS ---------- */
+function toggleDetails(el) {
+  const details = el.nextElementSibling;
+  details.classList.toggle('show');
+  el.textContent = details.classList.contains('show') ? 'Read Less' : 'Read More (Math)';
 }
 
 /* ---------- CALC HYPOTHETICAL ---------- */
@@ -1282,8 +1214,294 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 document.addEventListener('DOMContentLoaded', () => {
   const active = document.querySelector('.tab-btn.active');
   if (active) renderGroup(active.dataset.group);
-});
+})
 </script>
+
+<script>
+/* ---------- MODAL & HELPERS ---------- */
+function calcHypothetical(start, years, rate) {
+  const fv = (start *  Math.pow(1 + rate, years)).toFixed(2);
+  const multiplier = (fv / start).toFixed(1);
+  return { fv, multiplier };
+}
+
+/* ---------- MODAL  ---------- */
+const modal = document.getElementById('infoModal');
+const closeBtn = document.querySelector('#infoModal  .close');
+
+window.openModal = function(idx) {
+  const c = currencies[idx];
+
+  document.getElementById ('modalTitle').textContent = `${c.name} (${c.code})`;
+  document.getElementById('modalFlag').src = c.flag;
+   document.getElementById('modalMap').src = c.map;
+  document.getElementById('modalCountry').textContent =  c.country;
+  document.getElementById('modalCurrency').textContent = c.name;
+  document.getElementById ('modalISO').textContent = c.iso;
+  document.getElementById('modalISO4217').textContent = c.iso4217;
+   document.getElementById('modalDates').textContent = c.dates;
+  document.getElementById ('modalLastUSD').textContent = c.lastUSD;
+  document.getElementById('modalBacking').textContent = c.backing;
+   document.getElementById('modalHistory').textContent = c.history;
+
+  const years = 2025 - c.endYear;
+  const hypo =  calcHypothetical(c.histValue, years, c.growthRate);
+
+  const lostEl = document.getElementById('lostPotential');
+   lostEl.style.display = 'block';
+  document.getElementById('modalHypothetical').innerHTML = `~$${hypo.fv} USD  (${hypo.multiplier}x growth)`;
+  document.getElementById('modalDetails').innerHTML = `Formula: FV = $${c.histValue} x  (1 + ${(c.growthRate*100).toFixed(1)}%)^${years} years<br>Assumes stable growth (no wars/sanctions).`;
+   modal.style.display = 'flex';
+}
+
+// Close modal
+closeBtn.onclick = () => modal.style.display = 'none';
+window.onclick = e => { if  (e.target === modal) modal.style.display = 'none'; }
+</script>
+
+<script>
+/* ---------- RENDER TABLE (UPDATED TO USE LIVE PRICES) ---------- */
+const tbody = document.querySelector('#currencyTable tbody');
+
+function renderGroup(group) {
+  tbody.innerHTML = '';
+  const sloganEl = document.getElementById('tabSlogan');
+
+  const filtered = currencies
+    .filter(c => group === 'all' || c.group === group)
+    .filter(c => !c.hidden);
+
+  // Slogan
+  const withSlogan = filtered.find(c => c.slogan);
+  if (withSlogan && group !== 'all') {
+    sloganEl.textContent = `"${withSlogan.slogan}"`;
+    sloganEl.style.display = 'block';
+  } else {
+    sloganEl.style.display = 'none';
+  }
+
+  filtered.forEach((c) => {
+
+    /* NEW &#8594; get stored prices (if not yet fetched &#8594; undefined) */
+    const prev = priceStore[c.code]?.prev || null;
+    const curr = priceStore[c.code]?.curr || null;
+
+    const { change, class: changeClass, arrow } = getChangeDisplay(c.code);
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td data-label="Flag"><img src="${c.flag}" alt="${c.code}" class="flag-icon"></td>
+      <td data-label="Name">${c.name}</td>
+      <td data-label="Code">${c.code}</td>
+      <td data-label="Info"><button class="btn btn-info" onclick="openModal(${currencies.indexOf(c)})">More Info</button></td>
+      <td data-label="Pair">${c.pair}</td>
+      <td data-label="Trade">
+        <a href="https://xpmarket.com/dex/${c.code}-${c.issuer}/XRP?trade=market" target="_blank">
+          <button class="btn">Buy/Sell</button>
+        </a>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+</script>
+
+<script>
+/* ============================================================
+   LIVE PRICE + ARROW MODULE
+   Works with AMM pools AND classic DEX orderbooks.
+   Auto-detects pair direction. Safe — will NOT break tables.
+============================================================ */
+
+const priceStore = {};   // priceStore["RLUSD"] = { prev: X, curr: Y }
+
+/* ------------------------------------------------------------
+   Extract pair information (handles "XRP/RLUSD" or "ARS/XRP")
+------------------------------------------------------------ */
+function parsePair(c) {
+    const [left, right] = c.pair.split("/");
+
+    return {
+        base: left,
+        quote: right,
+        isBaseXRP: left === "XRP",
+        isQuoteXRP: right === "XRP"
+    };
+}
+
+/* ------------------------------------------------------------
+   Fetch price from AMM if available
+------------------------------------------------------------ */
+async function fetchAMMPrice(c) {
+    try {
+        const client = new xrpl.Client("wss://s1.ripple.com");
+        await client.connect();
+
+        const { base, quote } = parsePair(c);
+
+        const amm = await client.request({
+            command: "amm_info",
+            asset: base === "XRP"
+                ? { currency: "XRP" }
+                : { currency: base, issuer: c.issuer },
+            asset2: quote === "XRP"
+                ? { currency: "XRP" }
+                : { currency: quote, issuer: c.issuer }
+        });
+
+        client.disconnect();
+
+        if (!amm.result?.amm) return null;
+
+        const pool = amm.result.amm;
+
+        const a = parseFloat(pool.amount);
+        const b = parseFloat(pool.amount2);
+
+        if (!a || !b) return null;
+
+        return a / b;  // AMM spot price
+    } catch {
+        return null;
+    }
+}
+
+/* ------------------------------------------------------------
+   Fetch price from orderbook (fallback)
+------------------------------------------------------------ */
+async function fetchOrderbookPrice(c) {
+    try {
+        const client = new xrpl.Client("wss://s1.ripple.com");
+        await client.connect();
+
+        const { base, quote } = parsePair(c);
+
+        const res = await client.getOrderbook({
+            base: base === "XRP"
+                ? { currency: "XRP" }
+                : { currency: base, issuer: c.issuer },
+            counter: quote === "XRP"
+                ? { currency: "XRP" }
+                : { currency: quote, issuer: c.issuer }
+        });
+
+        client.disconnect();
+
+        if (!res.asks || res.asks.length === 0) return null;
+
+        return parseFloat(res.asks[0].quality);
+    } catch {
+        return null;
+    }
+}
+
+/* ------------------------------------------------------------
+   Get final price (AMM first, fallback to orderbook)
+------------------------------------------------------------ */
+async function fetchFinalPrice(c) {
+    let price = await fetchAMMPrice(c);
+
+    if (!price)
+        price = await fetchOrderbookPrice(c);
+
+    if (!price) return null;
+
+    const { base, quote } = parsePair(c);
+
+    // If your stored pair is reversed, correct the ratio
+    if (base === "XRP") price = 1 / price;
+
+    return price;
+}
+
+/* ------------------------------------------------------------
+   Update all prices and arrows
+------------------------------------------------------------ */
+async function updateAllPrices() {
+    for (const c of currencies) {
+
+        const price = await fetchFinalPrice(c);
+        if (!price) continue;
+
+        if (!priceStore[c.code]) {
+            priceStore[c.code] = { prev: price, curr: price };
+        } else {
+            priceStore[c.code].prev = priceStore[c.code].curr;
+            priceStore[c.code].curr = price;
+        }
+    }
+
+    // refresh active table only
+    const active = document.querySelector(".tab-btn.active");
+    if (active) renderGroup(active.dataset.group);
+}
+
+/* ------------------------------------------------------------
+   Arrow logic used by renderGroup()
+------------------------------------------------------------ */
+function getChangeDisplay(code) {
+    const entry = priceStore[code];
+
+    if (!entry) {
+        return {
+            change: "0.0%",
+            class: "neutral",
+            arrow: "&#8594;"
+        };
+    }
+
+    const { prev, curr } = entry;
+
+    const diff = ((curr - prev) / prev) * 100;
+
+    if (diff > 0) {
+        return {
+            change: diff.toFixed(2) + "%",
+            class: "up",
+            arrow: "&#9650;"
+        };
+    }
+    if (diff < 0) {
+        return {
+            change: diff.toFixed(2) + "%",
+            class: "down",
+            arrow: "&#9660;"
+        };
+    }
+    return {
+        change: "0.0%",
+        class: "neutral",
+        arrow: "&#8594;"
+    };
+}
+
+/* ------------------------------------------------------------
+   Start updating every 45s
+------------------------------------------------------------ */
+updateAllPrices();
+setInterval(updateAllPrices, 45000);
+
+</script>
+
+
+
+
+<!--<script>
+/* ---------- 24H CHANGE CALCULATION ---------- */
+function getChangeDisplay(prevPrice, currentPrice) {
+  if (! prevPrice || !currentPrice) return { change: "0%", arrow: "&#8596;", class: "no-change" };
+  const diff = currentPrice -  prevPrice;
+  const percent = ((diff / prevPrice) * 100).toFixed(2);
+  const isUp = percent > 0;
+  const isDown = percent < 0;
+   return {
+    change: (isUp ? "+" : "") + percent + "%",
+    arrow: isUp ? "&#8593;" : isDown ? "&#8595;" : "&#8596;",
+    class:  isUp ? "up" : isDown ? "down" : "no-change"
+  };
+}
+</script>-->
+
 
 <script>
 // ---- DOCUMENT MODALS (White Paper & Warning) ----
@@ -1302,7 +1520,7 @@ window.addEventListener('click', function(e){
     e.target.style.display = 'none';
     document.body.style.overflow = 'auto';
   }
-});
+})
 </script>
 
 <!--Email popup-->
@@ -1329,5 +1547,5 @@ window.addEventListener('click', function(e){
         openPopup('confirmationPopup'); // Show confirmation popup
     }
 </script>
-</body>
 
+</html>
