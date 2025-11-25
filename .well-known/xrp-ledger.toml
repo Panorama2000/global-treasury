@@ -1,0 +1,42 @@
+# xrp-ledger.toml for Global Treasury Tokens
+
+[[ISSUERS]]
+address = "r4CGc6QvQEHFysd5GJJEEZFx24ys4S4rFw"
+name = "Global Treasury"
+website = "https://panorama2000.github.io/global-treasury/"
+email = "panorama.2018@proton.me"
+
+# ─── VND ───────────────────────────────────────────────
+[[ISSUERS.TOKENS]]
+code = "VND"
+name = "Vietnamese Dong"
+description = "Digital representation of the Vietnamese Dong (VND) for the Treasury Series"
+icon = "https://raw.githubusercontent.com/panorama2000/global-treasury/main/flags/vnd.png"
+
+# ─── IQD ───────────────────────────────────────────────
+[[ISSUERS.TOKENS]]
+code = "IQD"
+name = "Iraqi Dinar"
+description = "Digital representation of the Iraqi Dinar (IQD) for the Treasury Series"
+icon = "https://raw.githubusercontent.com/panorama2000/global-treasury/main/flags/iqd.png"
+
+# ─── IDR ───────────────────────────────────────────────
+[[ISSUERS.TOKENS]]
+code = "IDR"
+name = "Indonesian Rupiah"
+description = "Digital representation of the Indonesian Rupiah (IDR) for the Treasury Series"
+icon = "https://raw.githubusercontent.com/panorama2000/global-treasury/main/flags/idr.png"
+
+# ─── ARS ───────────────────────────────────────────────
+[[ISSUERS.TOKENS]]
+code = "ARS"
+name = "Argentine Peso"
+description = "Digital representation of the Argentine Peso (ARS) for the Treasury Series"
+icon = "https://raw.githubusercontent.com/panorama2000/global-treasury/main/flags/ars.png"
+
+# ─── IRR ───────────────────────────────────────────────
+[[ISSUERS.TOKENS]]
+code = "IRR"
+name = "Iranian Rial"
+description = "Digital representation of the Iranian Rial (IRR) for the Treasury Series"
+icon = "https://raw.githubusercontent.com/panorama2000/global-treasury/main/flags/irr.png"
